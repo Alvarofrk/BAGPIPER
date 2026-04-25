@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://bagpipergin.com/</loc>
+    <lastmod>2025-04-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+
+    <!-- Product Images for Google Image Search -->
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b1.avif</image:loc>
+      <image:title>Bagpiper Black Pink Gin - Premium London Dry</image:title>
+      <image:caption>Bagpiper Black Pink, ginebra floral premium con notas de fresa, frambuesa e hibisco. Botánicos de Turquía y Japón.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b2.avif</image:loc>
+      <image:title>Bagpiper Classic Gin - London Dry California</image:title>
+      <image:caption>Bagpiper Classic, la expresión original. Seca, herbal y elegante. Ginebra craft estilo London Dry de California.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b3.avif</image:loc>
+      <image:title>Bagpiper Fruit Gin - Gin Tropical Premium</image:title>
+      <image:caption>Bagpiper Fruit, gin tropical moderno con notas de mango, durazno y piña. Botánicos de Perú y México.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b4.avif</image:loc>
+      <image:title>Bagpiper Gin - Sesión de Mixología Premium</image:title>
+      <image:caption>Cocktails y mixología premium con Bagpiper Gin. Craft gin de California para el mercado latinoamericano.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b5.avif</image:loc>
+      <image:title>Bagpiper Gin - Botánicos del Mundo</image:title>
+      <image:caption>Selección de botánicos de 6 países: Escocia, Alemania, Japón, Perú, México y Turquía que forman el alma de Bagpiper.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b6.avif</image:loc>
+      <image:title>Bagpiper Gin - Lifestyle Nocturno Urban</image:title>
+      <image:caption>Bagpiper Gin, el gin para el estilo de vida urbano y nocturno. Inspirado en Los Angeles, disponible en Perú.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b7.avif</image:loc>
+      <image:title>Bagpiper Gin - Editorial Night Mood</image:title>
+      <image:caption>Fotografía editorial de Bagpiper Gin con estética nocturna y actitud urbana. Premium craft gin.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpipergin.com/images/b8.avif</image:loc>
+      <image:title>Bagpiper Gin - Herencia y Vanguardia</image:title>
+      <image:caption>La historia de Bagpiper Gin: herencia escocesa y vanguardia California. Fundada por los hermanos Balt.</image:caption>
+    </image:image>
+  </url>
+</urlset>
