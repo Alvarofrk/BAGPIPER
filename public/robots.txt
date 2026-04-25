@@ -1,7 +1,7 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 
 # Disallow admin or private paths if added in the future
 # Disallow: /admin/
 
-Sitemap: https://bagpipergin.com/sitemap.xml
+Sitemap: https://bagpiperginoficial.site/sitemap.xml
