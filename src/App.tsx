@@ -44,7 +44,7 @@ function App() {
   }, []);
 
   const aboutImages = ["/images/b4.avif", "/images/b3.avif", "/images/b2.avif"];
-  const [aboutImgIndex, setAboutImgIndex] = useState(0);
+  const [_aboutImgIndex, setAboutImgIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
