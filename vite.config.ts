@@ -5,13 +5,13 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: "esnext",
-    minify: "esbuild",
+    minify: "oxc",
     cssMinify: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-          motion: ["framer-motion"],
+        manualChunks: (id) => {
+          if (id.includes("node_modules/framer-motion")) return "motion";
+          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor";
         },
         // Cache-busting filenames
         chunkFileNames: "assets/js/[name]-[hash].js",
