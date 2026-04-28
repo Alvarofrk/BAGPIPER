@@ -195,12 +195,12 @@ function App() {
               <img src="/images/b7.avif" alt="Bagpiper Black Pink" className="bg-img" />
               <div className="overlay" />
               <div className="content">
-                <span className="section-eyebrow">LA Energy / Nightlife</span>
+                <span className="section-eyebrow">SMITH & JOHNSON - CALIFORNIA</span>
                 <h1 className="hero-title">
                   MODERN <span className="accent">ROCK GIN</span>
                 </h1>
                 <p className="section-desc">
-                  Bagpiper mezcla craft californiano, actitud urbana y estetica nocturna en una identidad premium que redefine el estándar.
+                  Un legado destilado en el tiempo, renacido para conquistar el paladar contemporáneo.
                 </p>
                 <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
                   <a href="#coleccion" className="btn btn-primary">Ver Colección</a>
@@ -272,25 +272,41 @@ function App() {
           variants={staggerContainer}
         >
           <div className="container">
-            <motion.div variants={fadeUp} className="section-header">
+            <motion.div variants={fadeUp} className="section-header" style={{ textAlign: 'center', alignItems: 'center' }}>
               <span className="section-eyebrow">Sobre Nosotros</span>
               <h2 className="section-title">HERENCIA Y <span className="accent">VANGUARDIA</span></h2>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="bento-card about-bento-card">
-              <img src="/images/b8.avif" alt="Bagpiper Heritage" className="bg-img" />
-              <div className="overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4))' }} />
-              <div className="content about-bento-content">
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '800px' }}>
-                  <p className="section-desc" style={{ margin: '0', color: 'rgba(255, 255, 255, 0.95)', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                    <strong>Bagpiper Gin</strong> nace en California con espíritu internacional. Fundada por los hermanos Balt, relanzamos nuestra marca combinando la tradición escocesa de su destilado base con un enfoque <em>craft moderno</em> diseñado para el mercado global.
-                  </p>
-                  <p className="section-desc" style={{ margin: '0', color: 'rgba(255, 255, 255, 0.95)', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                    Nuestro London Dry destaca por un corazón firme de enebro silvestre y frescas notas de cítricos mediterráneos. Una expresión contemporánea y premium, enriquecida con botánicos cuidadosamente seleccionados de <strong>Escocia, Alemania, Japón, Perú, México y Turquía</strong>.
-                  </p>
-                </div>
+            <motion.div variants={fadeUp} className="heritage-layout" style={{ marginTop: '3rem' }}>
+              
+              {/* Left Text */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <strong style={{ color: '#fff', fontSize: '1.15em', fontWeight: '600' }}>Gin americano nacido en California</strong>, elaborado por la firma Smith & Jhonson Distilling Co., entidad fundada originalmente por los hermanos Balt Jhonson en el contexto de la expansión artesanal de destilados premium en la costa oeste de los Estados Unidos. Desde su concepción, la compañía orientó su filosofía productiva hacia la integración de técnicas tradicionales de destilación en alambique de cobre con un enfoque contemporáneo en la selección de botánicos de alta pureza.
+                </p>
+                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  Tras un prolongado periodo de inactividad operativa motivado por reestructuraciones internas y cambios en el mercado de bebidas espirituosas, la casa Smith & Jhonson cesó sus actividades durante varios años, manteniendo únicamente registros históricos y derechos de marca. No obstante, en el año 2020, la compañía fue reactivada bajo una estrategia de reposicionamiento internacional, retomando su legado con una propuesta renovada orientada a consumidores exigentes y conocedores del segmento premium.
+                </p>
               </div>
+
+              {/* Center Image */}
+              <div className="heritage-img-wrapper">
+                <img src="/images/b4.avif" alt="Bagpiper Heritage" loading="lazy" />
+              </div>
+
+              {/* Right Text */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  En esta nueva etapa, la firma adoptó un modelo de producción descentralizado, apoyándose en una red cuidadosamente seleccionada de destilerías asociadas en distintos territorios, lo que le permite optimizar eficiencias operativas sin comprometer los estándares técnicos ni el perfil sensorial característico de la marca. Este enfoque facilita el acceso a materias primas específicas y microclimas ideales para la expresión de ciertos botánicos, consolidando así una identidad de carácter internacional.
+                </p>
+                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  La reinserción de este producto en el mercado internacional responde a una tendencia creciente hacia la valorización de marcas con narrativa histórica, autenticidad productiva y una identidad cuidadosamente construida.
+                </p>
+                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <em style={{ color: '#fff', fontStyle: 'italic' }}>Actualmente, Smith & Jhonson posiciona este gin como una referencia dentro de su portafolio</em>, apuntando a consolidarse en circuitos especializados y mercados selectos donde la tradición, la técnica y la articulación de una red productiva global convergen como elementos diferenciadores.
+                </p>
+              </div>
+
             </motion.div>
           </div>
         </motion.section>
@@ -446,60 +462,33 @@ function App() {
         >
           <div className="container">
             <motion.div variants={fadeUp} className="section-header" style={{ alignItems: 'center', textAlign: 'center' }}>
-              <span className="section-eyebrow">Síguenos</span>
-              <h2 className="section-title">ÚNETE AL<br /><span className="text-outline">MOVIMIENTO</span></h2>
+              <span className="section-eyebrow">Próximamente</span>
+              <h2 className="section-title">GRANDES <span className="text-outline">SORPRESAS</span></h2>
+              <p className="section-desc" style={{ marginTop: '1rem', maxWidth: '600px', margin: '1rem auto 0' }}>
+                Acompáñanos en esta nueva etapa. Estamos preparando nuevas experiencias, ediciones especiales y más sorpresas. Sé el primero en descubrir lo que viene.
+              </p>
             </motion.div>
 
-            {/* Instagram Profile Card */}
-            <motion.a
-              variants={fadeUp}
-              href="https://www.instagram.com/bagpiperginperu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ig-profile-card"
-            >
-              <div className="ig-avatar">
-                <img src="/images/b1.avif" alt="Bagpiper Gin Peru Instagram" />
-              </div>
-              <div className="ig-profile-info">
-                <div className="ig-handle">@bagpiperginperu</div>
-                <div className="ig-name">Bagpiper Gin Perú</div>
-                <div className="ig-bio">California Craft Gin · London Dry · 🌿 Botánicos del Mundo</div>
-              </div>
-              <div className="ig-follow-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                Ver en Instagram
-              </div>
-            </motion.a>
+            {/* Instagram Profile Card removed */}
 
             {/* Preview grid using project images */}
-            <motion.div variants={fadeUp} className="ig-grid">
+            {/* Preview grid without IG links */}
+            <motion.div variants={fadeUp} className="ig-grid" style={{ marginTop: '3rem' }}>
               {["/images/b2.avif", "/images/b3.avif", "/images/b4.avif", "/images/b6.avif", "/images/b7.avif", "/images/b8.avif"].map((src, i) => (
-                <a
-                  key={i}
-                  href="https://www.instagram.com/bagpiperginperu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ig-grid-item"
-                >
-                  <img src={src} alt={`Bagpiper Instagram post ${i + 1}`} loading="lazy" />
+                <div key={i} className="ig-grid-item">
+                  <img src={src} alt={`Bagpiper preview ${i + 1}`} loading="lazy" />
                   <div className="ig-grid-overlay">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    <span style={{ color: 'white', fontFamily: 'var(--font-display)', letterSpacing: '0.1em' }}>BAGPIPER</span>
                   </div>
-                </a>
+                </div>
               ))}
             </motion.div>
 
-            {/* Final CTA */}
+            {/* Final message instead of CTA */}
             <motion.div variants={fadeUp} style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <a
-                href="https://www.instagram.com/bagpiperginperu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-              >
-                Seguir @bagpiperginperu
-              </a>
+              <div className="btn btn-outline" style={{ cursor: 'default' }}>
+                Coming Soon
+              </div>
             </motion.div>
           </div>
         </motion.section>
@@ -508,15 +497,9 @@ function App() {
       <footer className="footer">
         <div className="container">
           <div>© {new Date().getFullYear()} BAGPIPER DISTILLERY.</div>
-          <a
-            href="https://www.instagram.com/bagpiperginperu"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-accent)' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            @bagpiperginperu
-          </a>
+          <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            California Craft Gin
+          </div>
           <div>ALC. 40% VOL. · SÓLO PARA MAYORES DE EDAD LEGAL.</div>
         </div>
       </footer>
