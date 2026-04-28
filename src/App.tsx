@@ -331,7 +331,15 @@ function App() {
             </motion.div>
             
             <div className="gallery-grid">
-              {gallery.slice(1).map((img, idx) => {
+              {[
+                "/images/b2.avif",
+                "/images/b3.avif",
+                "/images/b4.avif",
+                "/images/b5.avif",
+                "/images/b6.avif",
+                "/images/b7.avif",
+                "/images/b6.avif" // Imagen repetida en lugar de b8.avif
+              ].map((img, idx) => {
                 const words = [
                   "BOTANICALS",
                   "CRAFTSMANSHIP",
@@ -339,7 +347,7 @@ function App() {
                   "DISTILLATION",
                   "ESSENCE",
                   "MIXOLOGY",
-                  "HERITAGE"
+                  "CULTURE"
                 ];
                 return (
                   <motion.div variants={fadeUp} key={idx} className="gallery-item">
