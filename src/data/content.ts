@@ -108,8 +108,8 @@ export const faqs = [
     a: "Bagpiper es un licor herbal — también llamado trago herbal — desarrollado en Estados Unidos en 2018 por Smith & Johnson & Co. Se elabora con hierbas, raíces, especias y botánicos. 35% vol., 750 ml, serve cold. Sitio oficial: bagpiper.site.",
   },
   {
-    q: "¿Bagpiper es un trago herbal como Jägermeister o Fernet?",
-    a: "Sí: Bagpiper entra en la misma categoría de licores herbales que Jägermeister y Fernet. No es Jägermeister ni Fernet; es una marca propia, de inspiración americana, pensada para consumo directo y coctelería.",
+    q: "¿Qué tipo de trago es Bagpiper?",
+    a: "Bagpiper es un licor herbal, un trago herbal elaborado con hierbas, raíces, especias y botánicos. Es una marca propia de inspiración americana, pensada para consumo directo y coctelería.",
   },
   {
     q: "¿Cómo se toma Bagpiper?",
@@ -126,7 +126,7 @@ export const products = [
     name: "Bagpiper Herbal Liqueur",
     tag: "The Dark Piper",
     description:
-      "Bagpiper es un licor herbal — un trago herbal de hierbas, raíces, especias y botánicos. Pertenece a la categoría de licores herbales, la misma familia de Jägermeister y Fernet, con fórmula e identidad propias. Serve cold. 35% vol. 750 ml.",
+      "Bagpiper es un licor herbal — un trago herbal de hierbas, raíces, especias y botánicos. Fórmula e identidad propias. Serve cold. 35% vol. 750 ml.",
     notes: ["Hierbas", "Especias", "Raíces", "Botánicos"],
     abv: "35% VOL.",
     volume: "750 ML",

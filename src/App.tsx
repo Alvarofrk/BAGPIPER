@@ -635,8 +635,8 @@ function App() {
                   LICOR <span className="text-outline">HERBAL</span>
                 </h2>
                 <p className="section-desc contact-lead">
-                  Bagpiper es un trago herbal de inspiración americana. Entra en la categoría de licores herbales —
-                  la misma familia de Jägermeister y Fernet — con receta, marca e identidad propias.
+                  Bagpiper es un trago herbal de inspiración americana: hierbas, raíces, especias y botánicos, con
+                  receta, marca e identidad propias.
                 </p>
               </motion.div>
 
