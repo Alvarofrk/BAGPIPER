@@ -1,6 +1,29 @@
-import { useState, useEffect } from "react";
-import { botanicals, navLinks, products, regions, stats } from "./data/content";
+import { useState, useEffect, useRef } from "react";
+import {
+  botanicals,
+  darkPiperSymbols,
+  marqueeItems,
+  navLinks,
+  products,
+  regions,
+  stats,
+  timeline,
+} from "./data/content";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+
+const PORTRAIT_IMG = "/images/bagpiperherbal-portrait.jpg";
+const CELLAR_IMG = "/images/bagpiper-cellar.jpg";
+const DARKNESS_IMG = "/images/bagpiper-darkness.jpg";
+const SUNSET_IMG = "/images/bagpiper-sunset.jpg";
+const HERO_VIDEO = "/images/videohome.mp4";
+const SIDE_VIDEO = "/images/bp.mp4";
+const product = products[0];
+
+const gallery = [
+  { src: CELLAR_IMG, label: "CELLAR SESSIONS", alt: "Bagpiper Herbal Liqueur en un lounge nocturno, con humo azul y magenta" },
+  { src: DARKNESS_IMG, label: "HELLO DARKNESS", alt: "Bagpiper Herbal Liqueur sobre barra oscura, con luces rojas y púrpuras" },
+  { src: SUNSET_IMG, label: "SUNSET SESSIONS", alt: "Bagpiper Herbal Liqueur en una terraza al atardecer, con neón Sunset Sessions" },
+];
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,29 +34,30 @@ function App() {
 
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
-  const gallery = [
-    "/images/b1.avif", // Hero and main
-    "/images/b2.avif",
-    "/images/b3.avif",
-    "/images/b4.avif",
-    "/images/b5.avif",
-    "/images/b6.avif",
-    "/images/b7.avif",
-    "/images/b8.avif",
-  ];
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const sideVideoRef = useRef<HTMLVideoElement>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [moodIndex, setMoodIndex] = useState(0);
+  const moodIndexRef = useRef(0);
+  moodIndexRef.current = moodIndex;
 
-  const marqueeItems = ["London Dry", "California Craft", "Vapour Infused", "Born for Nightlife", "Premium Botanicals"];
+  const moodSlides = [
+    { type: "video" as const, src: SIDE_VIDEO },
+    { type: "image" as const, src: CELLAR_IMG },
+    { type: "image" as const, src: DARKNESS_IMG },
+    { type: "image" as const, src: SUNSET_IMG },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,15 +67,79 @@ function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const aboutImages = ["/images/b4.avif", "/images/b3.avif", "/images/b2.avif"];
-  const [_aboutImgIndex, setAboutImgIndex] = useState(0);
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAboutImgIndex((prev) => (prev + 1) % aboutImages.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => {
+      setMoodIndex((i) => (i + 1) % moodSlides.length);
+    }, 4000);
+    return () => window.clearInterval(id);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    const hero = videoRef.current;
+    const side = sideVideoRef.current;
+
+    if (ageVerified !== true || reduceMotion) {
+      hero?.pause();
+      side?.pause();
+      return;
+    }
+
+    if (hero && !hero.src) hero.src = HERO_VIDEO;
+    if (side && !side.src) side.src = SIDE_VIDEO;
+
+    const playSideIfNeeded = (visible: boolean) => {
+      if (!side) return;
+      if (visible && moodIndexRef.current === 0) {
+        if (side.paused) {
+          side.currentTime = 0;
+          side.play().catch(() => {});
+        }
+      } else {
+        side.pause();
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+          if (video === side) {
+            playSideIfNeeded(entry.isIntersecting);
+            return;
+          }
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (hero) observer.observe(hero);
+    if (side) observer.observe(side);
+
+    playSideIfNeeded(true);
+
+    return () => observer.disconnect();
+  }, [ageVerified, reduceMotion, moodIndex]);
 
   const handleAgeAccept = () => {
     sessionStorage.setItem("bagpiper_age_ok", "true");
@@ -64,7 +152,10 @@ function App() {
 
   return (
     <>
-      {/* AGE VERIFICATION GATE */}
+      <a href="#main" className="skip-link">
+        Saltar al contenido
+      </a>
+
       <AnimatePresence>
         {ageVerified === null && (
           <motion.div
@@ -82,7 +173,8 @@ function App() {
               <div className="age-gate-divider" />
               <h2 className="age-gate-title">¿Eres mayor de 18 años?</h2>
               <p className="age-gate-desc">
-                El consumo de alcohol es exclusivo para mayores de edad.<br />
+                El consumo de alcohol es exclusivo para mayores de edad.
+                <br />
                 Por favor confirma tu edad para continuar.
               </p>
               <div className="age-gate-actions">
@@ -101,11 +193,7 @@ function App() {
         )}
 
         {ageVerified === false && (
-          <motion.div
-            className="age-gate age-gate--denied"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div className="age-gate age-gate--denied" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <motion.div
               className="age-gate-card"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -114,9 +202,7 @@ function App() {
               <div className="age-gate-logo">BAGPIPER</div>
               <div className="age-gate-divider" />
               <h2 className="age-gate-title">Lo sentimos</h2>
-              <p className="age-gate-desc">
-                Debes ser mayor de edad para acceder a este sitio.
-              </p>
+              <p className="age-gate-desc">Debes ser mayor de edad para acceder a este sitio.</p>
             </motion.div>
           </motion.div>
         )}
@@ -124,17 +210,14 @@ function App() {
 
       <div className="noise-overlay" />
       <div className="app-wrapper">
-        {/* NAVBAR */}
         <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
           <div className="container nav-container">
-            {/* Logo */}
             <a href="#top" className="nav-logo">
               <span className="nav-logo-main">BAGPIPER</span>
-              <span className="nav-logo-sub">California Craft Gin</span>
+              <span className="nav-logo-sub">Herbal Liqueur</span>
             </a>
 
-            {/* Desktop nav links — hidden on mobile */}
-            <nav className="nav-links-desktop">
+            <nav className="nav-links-desktop" aria-label="Principal">
               {navLinks.map((link) => (
                 <a key={link.label} href={link.href} className="nav-link">
                   {link.label}
@@ -142,376 +225,454 @@ function App() {
               ))}
             </nav>
 
-            {/* Right: CTA + Hamburger */}
             <div className="nav-right">
-              <a href="#contacto" className="nav-cta">Contacto</a>
+              <a href="#contacto" className="nav-cta">
+                Contacto
+              </a>
               <button
                 className={`menu-toggle ${menuOpen ? "open" : ""}`}
                 onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Toggle menu"
+                aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+                aria-expanded={menuOpen}
               >
-                <span /><span /><span />
+                <span />
+                <span />
+                <span />
               </button>
             </div>
           </div>
         </header>
 
-        {/* Mobile overlay — OUTSIDE header so it can cover full viewport */}
         {menuOpen && (
           <div className="mobile-menu-overlay" onClick={() => setMenuOpen(false)}>
-            <nav className="mobile-menu-nav" onClick={(e) => e.stopPropagation()}>
+            <nav className="mobile-menu-nav" onClick={(e) => e.stopPropagation()} aria-label="Móvil">
               <div className="mobile-menu-top">
                 <span className="nav-logo-main">BAGPIPER</span>
                 <button className="menu-toggle open" onClick={() => setMenuOpen(false)} aria-label="Cerrar">
-                  <span /><span /><span />
+                  <span />
+                  <span />
+                  <span />
                 </button>
               </div>
               <div className="mobile-menu-links">
                 {navLinks.map((link) => (
-                  <a key={link.label} href={link.href} className="mobile-menu-link" onClick={() => setMenuOpen(false)}>
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="mobile-menu-link"
+                    onClick={() => setMenuOpen(false)}
+                  >
                     {link.label}
                   </a>
                 ))}
               </div>
               <div className="mobile-menu-footer">
-                <a href="#contacto" className="mobile-menu-cta" onClick={() => setMenuOpen(false)}>Contacto</a>
-                <p className="mobile-menu-tagline">California Craft Gin · London Dry</p>
+                <a href="#contacto" className="mobile-menu-cta" onClick={() => setMenuOpen(false)}>
+                  Contacto
+                </a>
+                <p className="mobile-menu-tagline">Herbal Liqueur · The Dark Piper</p>
               </div>
             </nav>
           </div>
         )}
 
-      <main id="top">
-        {/* HERO SECTION - BENTO GRID */}
-        <motion.section 
-          className="container"
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-        >
-          <div className="hero-bento">
-            {/* Main Hero Card */}
-            <motion.div variants={fadeUp} className="bento-card bento-card-main">
-              <img src="/images/b7.avif" alt="Bagpiper Black Pink" className="bg-img" />
-              <div className="overlay" />
-              <div className="content">
-                <span className="section-eyebrow">SMITH & JOHNSON - CALIFORNIA</span>
-                <h1 className="hero-title">
-                  MODERN <span className="accent">ROCK GIN</span>
-                </h1>
-                <p className="section-desc">
-                  Un legado destilado en el tiempo, renacido para conquistar el paladar contemporáneo.
-                </p>
-                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                  <a href="#coleccion" className="btn btn-primary">Ver Colección</a>
-                  <a href="#contacto" className="btn btn-outline">Distribución</a>
+        <main id="main">
+          <motion.section className="container" id="top" initial="hidden" animate="visible" variants={staggerContainer}>
+            <div className="hero-bento">
+              <motion.div variants={fadeUp} className="bento-card bento-card-main">
+                <video
+                  ref={videoRef}
+                  className="bg-video"
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                  poster={CELLAR_IMG}
+                  aria-hidden="true"
+                />
+                <div className="overlay" />
+                <div className="content">
+                  <span className="section-eyebrow">Smith &amp; Johnson &amp; Co. · USA · Est. 2018</span>
+                  <h1 className="hero-title">
+                    BAGPIPER <span className="accent">LICOR HERBAL</span>
+                  </h1>
+                  <p className="section-desc">
+                    Un licor herbal de inspiración americana, desarrollado originalmente por Smith &amp; Johnson &amp;
+                    Co. y reactivado para una nueva etapa de expansión internacional.
+                  </p>
+                  <div className="hero-actions">
+                    <a href="#leyenda" className="btn btn-primary">
+                      Descubrir la leyenda
+                    </a>
+                    <a href="#contacto" className="btn btn-outline">
+                      Distribución
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            {/* Side Stats Cards */}
-            <div className="bento-side-cards">
-              
-              {/* Card 1: Pasarela de Imágenes */}
-              <motion.div variants={fadeUp} className="bento-card bento-card-stat">
-                <div className="stat-slider-wrapper" style={{ opacity: 0.6 }}>
-                  <div className="stat-slider-track" style={{ animationDuration: '30s' }}>
-                    {[...gallery, ...gallery].map((img, i) => (
-                      <img key={i} src={img} alt="Bagpiper Premium London Dry Gin California" loading="lazy" />
+              <div className="bento-side-cards">
+                <motion.div variants={fadeUp} className="bento-card bento-card-stat bento-card-mini-video">
+                  <div className="mood-rotator" aria-hidden="true">
+                    <video
+                      ref={sideVideoRef}
+                      className={`mood-slide side-video ${moodIndex === 0 ? "is-active" : ""}`}
+                      muted
+                      playsInline
+                      preload="none"
+                      poster={DARKNESS_IMG}
+                    />
+                    {moodSlides.slice(1).map((slide, i) => (
+                      <img
+                        key={slide.src}
+                        src={slide.src}
+                        alt=""
+                        className={`mood-slide ${moodIndex === i + 1 ? "is-active" : ""}`}
+                      />
                     ))}
                   </div>
-                </div>
-                <div className="stat-content">
-                  <div className="stat-label">Visuals</div>
-                  <div className="stat-val" style={{ fontSize: '1.5rem' }}>MOODBOARD</div>
-                </div>
-              </motion.div>
-
-              {/* Card 2: Info Combinada de Stats */}
-              <motion.div variants={fadeUp} className="bento-card bento-card-stat">
-                <div className="stat-content" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', height: '100%' }}>
-                  {stats.map((stat, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div className="stat-label" style={{ maxWidth: '60%' }}>{stat.title}</div>
-                      <div className="stat-val" style={{ fontSize: '2.5rem' }}>{stat.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Card 3: Award Winning */}
-              <motion.div variants={fadeUp} className="bento-card bento-card-stat" style={{ justifyContent: 'center', alignItems: 'center', background: 'var(--color-accent)' }}>
-                <div className="stat-content" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', textAlign: 'center', color: '#fff' }}>
-                    AWARD<br/>WINNING
-                  </h3>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* MARQUEE */}
-        <div className="marquee-wrapper">
-          <div className="marquee-content">
-            {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
-              <div key={`${item}-${index}`} className="marquee-item">
-                <span>✦</span> {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* HISTORIA / SOBRE NOSOTROS */}
-        <motion.section 
-          id="historia" 
-          className="section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="container">
-            <motion.div variants={fadeUp} className="section-header" style={{ textAlign: 'center', alignItems: 'center' }}>
-              <span className="section-eyebrow">Sobre Nosotros</span>
-              <h2 className="section-title">HERENCIA Y <span className="accent">VANGUARDIA</span></h2>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="heritage-layout" style={{ marginTop: '3rem' }}>
-              
-              {/* Left Text */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
-                  <strong style={{ color: '#fff', fontSize: '1.15em', fontWeight: '600' }}>Gin americano nacido en California</strong>, elaborado por la firma Smith & Jhonson Distilling Co., entidad fundada originalmente por los hermanos Balt Jhonson en el contexto de la expansión artesanal de destilados premium en la costa oeste de los Estados Unidos. Desde su concepción, la compañía orientó su filosofía productiva hacia la integración de técnicas tradicionales de destilación en alambique de cobre con un enfoque contemporáneo en la selección de botánicos de alta pureza.
-                </p>
-                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
-                  Tras un prolongado periodo de inactividad operativa motivado por reestructuraciones internas y cambios en el mercado de bebidas espirituosas, la casa Smith & Jhonson cesó sus actividades durante varios años, manteniendo únicamente registros históricos y derechos de marca. No obstante, en el año 2020, la compañía fue reactivada bajo una estrategia de reposicionamiento internacional, retomando su legado con una propuesta renovada orientada a consumidores exigentes y conocedores del segmento premium.
-                </p>
-              </div>
-
-              {/* Center Image */}
-              <div className="heritage-img-wrapper">
-                <img src="/images/b4.avif" alt="Bagpiper Heritage" loading="lazy" />
-              </div>
-
-              {/* Right Text */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
-                  En esta nueva etapa, la firma adoptó un modelo de producción descentralizado, apoyándose en una red cuidadosamente seleccionada de destilerías asociadas en distintos territorios, lo que le permite optimizar eficiencias operativas sin comprometer los estándares técnicos ni el perfil sensorial característico de la marca. Este enfoque facilita el acceso a materias primas específicas y microclimas ideales para la expresión de ciertos botánicos, consolidando así una identidad de carácter internacional.
-                </p>
-                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
-                  La reinserción de este producto en el mercado internacional responde a una tendencia creciente hacia la valorización de marcas con narrativa histórica, autenticidad productiva y una identidad cuidadosamente construida.
-                </p>
-                <p className="section-desc" style={{ margin: '0', fontSize: '1.05rem', lineHeight: '1.6', textAlign: 'justify', color: 'rgba(255, 255, 255, 0.9)' }}>
-                  <em style={{ color: '#fff', fontStyle: 'italic' }}>Actualmente, Smith & Jhonson posiciona este gin como una referencia dentro de su portafolio</em>, apuntando a consolidarse en circuitos especializados y mercados selectos donde la tradición, la técnica y la articulación de una red productiva global convergen como elementos diferenciadores.
-                </p>
-              </div>
-
-            </motion.div>
-          </div>
-        </motion.section>
-
-        {/* EDITORIAL GALLERY (MASONRY BENTO) */}
-        <motion.section 
-          id="mundo" 
-
-          className="section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="container">
-            <motion.div variants={fadeUp} className="section-header">
-              <span className="section-eyebrow">Visual Language</span>
-              <h2 className="section-title">NIGHT EDITORIAL MOOD</h2>
-              <p className="section-desc">
-                Visuales con textura nocturna, luz controlada y actitud urbana para una narrativa premium. Inspirados por el ritmo de Los Angeles.
-              </p>
-            </motion.div>
-            
-            <div className="gallery-grid">
-              {[
-                "/images/b2.avif",
-                "/images/b3.avif",
-                "/images/b4.avif",
-                "/images/b5.avif",
-                "/images/b6.avif",
-                "/images/b7.avif",
-                "/images/b6.avif" // Imagen repetida en lugar de b8.avif
-              ].map((img, idx) => {
-                const words = [
-                  "BOTANICALS",
-                  "CRAFTSMANSHIP",
-                  "JUNIPER",
-                  "DISTILLATION",
-                  "ESSENCE",
-                  "MIXOLOGY",
-                  "CULTURE"
-                ];
-                return (
-                  <motion.div variants={fadeUp} key={idx} className="gallery-item">
-                    <img src={img} alt={`Bagpiper Premium Gin London Dry - ${words[idx]}`} loading="lazy" />
-                    <div className="gallery-overlay">
-                      <span className="gallery-text">{words[idx] || `FRAME 0${idx + 1}`}</span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* PRODUCTS (COLECCION) */}
-        <motion.section 
-          id="coleccion" 
-          className="section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="container">
-            <motion.div variants={fadeUp} className="section-header">
-              <span className="section-eyebrow">The Collection</span>
-              <h2 className="section-title">THREE SIGNATURES</h2>
-            </motion.div>
-            
-            <div className="products-grid">
-              {products.map((product) => {
-                let imgSrc = "";
-                if (product.name.includes("Classic")) imgSrc = "/images/b2.avif";
-                else if (product.name.includes("Black Pink")) imgSrc = "/images/b1.avif";
-                else if (product.name.includes("Fruit")) imgSrc = "/images/b3.avif";
-
-                return (
-                  <motion.article variants={fadeUp} key={product.name} className="product-card-new">
-                    <div className="product-card-img">
-                      {imgSrc && <img src={imgSrc} alt={product.name} loading="lazy" />}
-                      <div className="product-card-overlay" />
-                    </div>
-                    <div className="product-card-body">
-                      <div className="product-card-tag">Bagpiper Gin</div>
-                      <h3 className="product-card-title">{product.name}</h3>
-                      <p className="product-card-desc">{product.description}</p>
-                      <div className="product-notes">
-                        {product.notes.map((note) => (
-                          <span key={note} className="note-pill">{note}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.article>
-                );
-              })}
-            </div>
-
-          </div>
-        </motion.section>
-
-        {/* BOTANICALS */}
-        <motion.section 
-          id="botanicos" 
-          className="section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="container">
-            <div className="botanicals-layout">
-
-              {/* Left: Image panel */}
-              <motion.div variants={fadeUp} className="botanicals-img-panel">
-                <img src="/images/b5.avif" alt="Bagpiper Gin Botánicos del Mundo" loading="lazy" />
-                <div className="botanicals-img-label">
-                  <span className="section-eyebrow" style={{ color: '#fff' }}>Perfil Aromático</span>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-serif)', marginTop: '0.25rem' }}>6 países · 8 botánicos</p>
-                </div>
-              </motion.div>
-
-              {/* Right: Content */}
-              <div className="botanicals-content">
-                <motion.div variants={fadeUp} className="section-header" style={{ marginBottom: '2rem' }}>
-                  <span className="section-eyebrow">Botánicos del Mundo</span>
-                  <h2 className="section-title">ALMA<br/><span className="text-outline">BOTÁNICA</span></h2>
-                  <p className="section-desc">
-                    Una selección curada de ingredientes de seis países que forman el carácter único de Bagpiper.
-                  </p>
-                </motion.div>
-
-                <motion.div variants={fadeUp} className="botanicals-tags">
-                  {botanicals.map((botanical) => (
-                    <span key={botanical} className="botanical-tag">{botanical}</span>
-                  ))}
-                </motion.div>
-
-                <motion.div variants={fadeUp} className="regions-list">
-                  {regions.map((region) => (
-                    <div key={region.name} className="region-item">
-                      <span className="region-name">{region.name}</span>
-                      <span className="region-role">{region.role}</span>
-                    </div>
-                  ))}
-                </motion.div>
-              </div>
-
-            </div>
-          </div>
-        </motion.section>
-
-        {/* CONTACTO / INSTAGRAM */}
-        <motion.section
-          id="contacto"
-          className="section ig-section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="container">
-            <motion.div variants={fadeUp} className="section-header" style={{ alignItems: 'center', textAlign: 'center' }}>
-              <span className="section-eyebrow">Próximamente</span>
-              <h2 className="section-title">GRANDES <span className="text-outline">SORPRESAS</span></h2>
-              <p className="section-desc" style={{ marginTop: '1rem', maxWidth: '600px', margin: '1rem auto 0' }}>
-                Acompáñanos en esta nueva etapa. Estamos preparando nuevas experiencias, ediciones especiales y más sorpresas. Sé el primero en descubrir lo que viene.
-              </p>
-            </motion.div>
-
-            {/* Instagram Profile Card removed */}
-
-            {/* Preview grid using project images */}
-            {/* Preview grid without IG links */}
-            <motion.div variants={fadeUp} className="ig-grid" style={{ marginTop: '3rem' }}>
-              {["/images/b2.avif", "/images/b3.avif", "/images/b4.avif", "/images/b6.avif", "/images/b7.avif", "/images/b8.avif"].map((src, i) => (
-                <div key={i} className="ig-grid-item">
-                  <img src={src} alt={`Bagpiper preview ${i + 1}`} loading="lazy" />
-                  <div className="ig-grid-overlay">
-                    <span style={{ color: 'white', fontFamily: 'var(--font-display)', letterSpacing: '0.1em' }}>BAGPIPER</span>
+                  <div className="side-video-overlay" />
+                  <div className="stat-content">
+                    <div className="stat-label">Identidad</div>
+                    <div className="stat-val stat-val-sm">DARK PIPER</div>
                   </div>
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="bento-card bento-card-stat">
+                  <div className="stat-content stat-content-stack">
+                    {stats.map((stat) => (
+                      <div key={stat.value} className="stat-row">
+                        <div className="stat-label">{stat.title}</div>
+                        <div className="stat-val">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="bento-card bento-card-stat bento-card-label">
+                  <div className="spec-label">
+                    <p className="spec-label-eyebrow">Premium Quality</p>
+                    <p className="spec-label-abv">
+                      35<span>%</span>
+                    </p>
+                    <p className="spec-label-vol">Vol.</p>
+                    <div className="spec-label-rule" />
+                    <div className="spec-label-row">
+                      <span>750 ML</span>
+                      <span className="spec-label-serve">Serve Cold</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.section>
+
+          <div className="marquee-wrapper" aria-hidden="true">
+            <div className="marquee-content">
+              {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
+                <div key={`${item}-${index}`} className="marquee-item">
+                  <span>✦</span> {item}
                 </div>
               ))}
-            </motion.div>
+            </div>
+          </div>
 
-            {/* Final message instead of CTA */}
-            <motion.div variants={fadeUp} style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <div className="btn btn-outline" style={{ cursor: 'default' }}>
-                Coming Soon
+          <motion.section
+            id="historia"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header section-header-center">
+                <span className="section-eyebrow">Sobre Nosotros</span>
+                <h2 className="section-title">
+                  DESARROLLADO EN USA <span className="accent">REINTRODUCIDO EN 2024</span>
+                </h2>
+                <p className="section-desc">
+                  Bagpiper es un licor herbal desarrollado originalmente en Estados Unidos en 2018 por Smith &amp;
+                  Johnson &amp; Co., compañía dedicada al desarrollo y comercialización de bebidas espirituosas y
+                  licores botánicos.
+                </p>
+              </motion.div>
+
+              <div className="heritage-layout">
+                <motion.div variants={fadeUp} className="timeline">
+                  {timeline.slice(0, 2).map((item) => (
+                    <article key={item.year} className="timeline-item">
+                      <span className="timeline-year">{item.year}</span>
+                      <h3 className="timeline-title">{item.title}</h3>
+                      <p className="timeline-text">{item.text}</p>
+                    </article>
+                  ))}
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="heritage-img-wrapper">
+                  <img
+                    src={PORTRAIT_IMG}
+                    alt="Bagpiper Herbal Liqueur, botella ámbar con etiqueta vintage y el emblema del Dark Piper"
+                    width={900}
+                    height={1200}
+                    loading="lazy"
+                  />
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="timeline">
+                  {timeline.slice(2).map((item) => (
+                    <article key={item.year} className="timeline-item">
+                      <span className="timeline-year">{item.year}</span>
+                      <h3 className="timeline-title">{item.title}</h3>
+                      <p className="timeline-text">{item.text}</p>
+                    </article>
+                  ))}
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </motion.section>
-      </main>
+            </div>
+          </motion.section>
 
-      <footer className="footer">
-        <div className="container">
-          <div>© {new Date().getFullYear()} BAGPIPER DISTILLERY.</div>
-          <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            California Craft Gin
+          <motion.section
+            id="leyenda"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="legend-intro">
+                <div>
+                  <span className="section-eyebrow">La identidad</span>
+                  <h2 className="section-title">
+                    EL <span className="text-outline">DARK PIPER</span>
+                  </h2>
+                </div>
+                <p className="section-desc">
+                  La identidad visual de Bagpiper está basada en la figura del Dark Piper, un personaje inspirado en
+                  una antigua leyenda relacionada con un misterioso gaitero de los bosques. Según la leyenda, el
+                  gaitero conocía las propiedades de diferentes plantas y botánicos y elaboraba mezclas utilizando
+                  hierbas, raíces, especias, flores y frutos recolectados del bosque.
+                </p>
+              </motion.div>
+
+              <div className="legend-grid">
+                {darkPiperSymbols.map((symbol) => (
+                  <motion.article variants={fadeUp} key={symbol.name} className="legend-card">
+                    <span className="legend-role">{symbol.role}</span>
+                    <h3 className="legend-name">{symbol.name}</h3>
+                    <p className="legend-text">{symbol.text}</p>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="mundo"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header">
+                <span className="section-eyebrow">Visual Language</span>
+                <h2 className="section-title">NIGHT EDITORIAL MOOD</h2>
+                <p className="section-desc">
+                  El Dark Piper en la noche: barra, humo y terraza. Tres tomas de fiesta para consumo directo y
+                  coctelería.
+                </p>
+              </motion.div>
+
+              <div className="gallery-grid gallery-grid-night">
+                {gallery.map((item) => (
+                  <motion.div variants={fadeUp} key={item.src} className="gallery-item">
+                    <img src={item.src} alt={item.alt} loading="lazy" />
+                    <div className="gallery-overlay">
+                      <span className="gallery-text">{item.label}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="coleccion"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header">
+                <span className="section-eyebrow">The Collection</span>
+                <h2 className="section-title">LA FIRMA</h2>
+              </motion.div>
+
+              <motion.article variants={fadeUp} className="product-featured">
+                <div className="product-featured-img">
+                  <img
+                    src={CELLAR_IMG}
+                    alt="Bagpiper Herbal Liqueur en un lounge nocturno, con humo azul y magenta sobre la barra"
+                    width={1400}
+                    height={787}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="product-featured-body">
+                  <div className="product-card-tag">{product.tag}</div>
+                  <h3 className="product-card-title">{product.name}</h3>
+                  <p className="product-card-desc">{product.description}</p>
+                  <div className="product-specs">
+                    <div>
+                      <span>Alcohol</span>
+                      <strong>{product.abv}</strong>
+                    </div>
+                    <div>
+                      <span>Formato</span>
+                      <strong>{product.volume}</strong>
+                    </div>
+                    <div>
+                      <span>Servicio</span>
+                      <strong>{product.serve}</strong>
+                    </div>
+                  </div>
+                  <div className="product-notes">
+                    {product.notes.map((note) => (
+                      <span key={note} className="note-pill">
+                        {note}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="product-line">
+                    Developed in the USA — 2018
+                    <br />
+                    Reintroduced internationally — 2024
+                  </p>
+                </div>
+              </motion.article>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="botanicos"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <div className="botanicals-layout">
+                <motion.div variants={fadeUp} className="botanicals-img-panel">
+                  <img
+                    src={PORTRAIT_IMG}
+                    alt="Botánicos alrededor de Bagpiper: hojas, bayas, anís estrellado y brezo púrpura"
+                    width={900}
+                    height={1200}
+                    loading="lazy"
+                  />
+                  <div className="botanicals-img-label">
+                    <span className="section-eyebrow" style={{ color: "#fff" }}>
+                      Perfil Aromático
+                    </span>
+                    <p className="botanicals-img-copy">Hierbas · Raíces · Especias · Flores · Frutos</p>
+                  </div>
+                </motion.div>
+
+                <div className="botanicals-content">
+                  <motion.div variants={fadeUp} className="section-header" style={{ marginBottom: "2rem" }}>
+                    <span className="section-eyebrow">Selección botánica</span>
+                    <h2 className="section-title">
+                      ALMA
+                      <br />
+                      <span className="text-outline">BOTÁNICA</span>
+                    </h2>
+                    <p className="section-desc">
+                      Crafted with selected herbs &amp; botanicals. Una combinación de hierbas, raíces, especias,
+                      flores y frutos que da forma al carácter misterioso de Bagpiper.
+                    </p>
+                  </motion.div>
+
+                  <motion.div variants={fadeUp} className="botanicals-tags">
+                    {botanicals.map((botanical) => (
+                      <span key={botanical} className="botanical-tag">
+                        {botanical}
+                      </span>
+                    ))}
+                  </motion.div>
+
+                  <motion.div variants={fadeUp} className="regions-list">
+                    {regions.map((region) => (
+                      <div key={region.name} className="region-item">
+                        <span className="region-name">{region.name}</span>
+                        <span className="region-role">{region.role}</span>
+                      </div>
+                    ))}
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="contacto"
+            className="section ig-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header section-header-center">
+                <span className="section-eyebrow">Latinoamérica</span>
+                <h2 className="section-title">
+                  NUEVA <span className="text-outline">ETAPA</span>
+                </h2>
+                <p className="section-desc contact-lead">
+                  A partir de 2024, Bagpiper trabaja con importadores y distribuidores de bebidas espirituosas en
+                  Latinoamérica. La marca se posiciona en la categoría de licores herbales, tanto para consumo directo
+                  como para coctelería.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="contact-panel">
+                <img
+                  src={DARKNESS_IMG}
+                  alt=""
+                  className="contact-panel-bg"
+                  width={1400}
+                  height={934}
+                  loading="lazy"
+                />
+                <div className="contact-panel-content">
+                  <p className="section-eyebrow">Distribución</p>
+                  <h3>Presencia progresiva en la región</h3>
+                  <p>
+                    Modernización de la presentación, fortalecimiento de la distribución y expansión hacia mercados
+                    internacionales. Próximamente, nuevas alianzas comerciales en la región.
+                  </p>
+                  <div className="btn btn-outline" style={{ cursor: "default" }}>
+                    Coming Soon
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.section>
+        </main>
+
+        <footer className="footer">
+          <div className="container">
+            <div>© {new Date().getFullYear()} BAGPIPER · SMITH &amp; JOHNSON &amp; CO.</div>
+            <div className="footer-tag">Herbal Liqueur · Est. 2018</div>
+            <div>ALC. 35% VOL. · SÓLO PARA MAYORES DE EDAD LEGAL.</div>
           </div>
-          <div>ALC. 40% VOL. · SÓLO PARA MAYORES DE EDAD LEGAL.</div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
     </>
   );
 }

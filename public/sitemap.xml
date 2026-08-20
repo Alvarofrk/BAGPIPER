@@ -3,50 +3,29 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://bagpiperginoficial.site/</loc>
-    <lastmod>2026-04-25</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
 
-    <!-- Product Images for Google Image Search -->
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b1.jpg</image:loc>
-      <image:title>Bagpiper Black Pink Gin - Premium London Dry</image:title>
-      <image:caption>Bagpiper Black Pink, ginebra floral premium con notas de fresa, frambuesa e hibisco. Botanicos de Turquia y Japon.</image:caption>
+      <image:loc>https://bagpiperginoficial.site/images/bagpiperherbal-og.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — The Dark Piper</image:title>
+      <image:caption>Bagpiper, licor herbal de inspiración americana. Desarrollado en USA en 2018 y reintroducido internacionalmente en 2024.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b2.jpg</image:loc>
-      <image:title>Bagpiper Classic Gin - London Dry California</image:title>
-      <image:caption>Bagpiper Classic, la expresion original. Seca, herbal y elegante. Ginebra craft estilo London Dry de California.</image:caption>
+      <image:loc>https://bagpiperginoficial.site/images/bagpiper-cellar.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Nightlife</image:title>
+      <image:caption>Bagpiper Herbal Liqueur en un lounge nocturno, con atmósfera de barra y humo.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b3.jpg</image:loc>
-      <image:title>Bagpiper Fruit Gin - Gin Tropical Premium</image:title>
-      <image:caption>Bagpiper Fruit, gin tropical moderno con notas de mango, durazno y pina. Botanicos de Peru y Mexico.</image:caption>
+      <image:loc>https://bagpiperginoficial.site/images/bagpiper-darkness.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — The Dark Piper</image:title>
+      <image:caption>Bagpiper Herbal Liqueur sobre barra oscura, con iluminación roja y púrpura.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b4.jpg</image:loc>
-      <image:title>Bagpiper Gin - Sesion de Mixologia Premium</image:title>
-      <image:caption>Cocktails y mixologia premium con Bagpiper Gin. Craft gin de California para el mercado latinoamericano.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b5.jpg</image:loc>
-      <image:title>Bagpiper Gin - Botanicos del Mundo</image:title>
-      <image:caption>Seleccion de botanicos de 6 paises: Escocia, Alemania, Japon, Peru, Mexico y Turquia que forman el alma de Bagpiper.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b6.jpg</image:loc>
-      <image:title>Bagpiper Gin - Lifestyle Nocturno Urban</image:title>
-      <image:caption>Bagpiper Gin, el gin para el estilo de vida urbano y nocturno. Inspirado en Los Angeles, disponible en Peru.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b7.jpg</image:loc>
-      <image:title>Bagpiper Gin - Editorial Night Mood</image:title>
-      <image:caption>Fotografia editorial de Bagpiper Gin con estetica nocturna y actitud urbana. Premium craft gin.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/b8.jpg</image:loc>
-      <image:title>Bagpiper Gin - Herencia y Vanguardia</image:title>
-      <image:caption>La historia de Bagpiper Gin: herencia escocesa y vanguardia California. Fundada por los hermanos Balt.</image:caption>
+      <image:loc>https://bagpiperginoficial.site/images/bagpiper-sunset.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Sunset Sessions</image:title>
+      <image:caption>Bagpiper Herbal Liqueur en una terraza al atardecer, con neón Sunset Sessions.</image:caption>
     </image:image>
   </url>
 </urlset>
