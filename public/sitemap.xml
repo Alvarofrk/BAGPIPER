@@ -1,31 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
-    <loc>https://bagpiperginoficial.site/</loc>
+    <loc>https://bagpiper.site/</loc>
     <lastmod>2026-08-19</lastmod>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
 
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/bagpiperherbal-og.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — The Dark Piper</image:title>
-      <image:caption>Bagpiper, licor herbal de inspiración americana. Desarrollado en USA en 2018 y reintroducido internacionalmente en 2024.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiperherbal-og.jpg</image:loc>
+      <image:title>Bagpiper Licor Herbal — The Dark Piper</image:title>
+      <image:caption>Bagpiper, licor herbal y trago herbal de inspiración americana. 35% vol. Serve cold.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/bagpiper-cellar.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — Nightlife</image:title>
-      <image:caption>Bagpiper Herbal Liqueur en un lounge nocturno, con atmósfera de barra y humo.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-cellar.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Cellar Sessions</image:title>
+      <image:caption>Trago herbal Bagpiper en lounge nocturno.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/bagpiper-darkness.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — The Dark Piper</image:title>
-      <image:caption>Bagpiper Herbal Liqueur sobre barra oscura, con iluminación roja y púrpura.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-darkness.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Hello Darkness</image:title>
+      <image:caption>Licor herbal Bagpiper sobre barra oscura.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiperginoficial.site/images/bagpiper-sunset.jpg</image:loc>
+      <image:loc>https://bagpiper.site/images/bagpiper-sunset.jpg</image:loc>
       <image:title>Bagpiper Herbal Liqueur — Sunset Sessions</image:title>
-      <image:caption>Bagpiper Herbal Liqueur en una terraza al atardecer, con neón Sunset Sessions.</image:caption>
+      <image:caption>Bagpiper licor herbal en terraza al atardecer.</image:caption>
     </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiperherbal-hero.jpg</image:loc>
+      <image:title>Bagpiper Licor Herbal — Destilería</image:title>
+      <image:caption>Botella de Bagpiper con botánicos y alambique de cobre.</image:caption>
+    </image:image>
+
+    <video:video>
+      <video:thumbnail_loc>https://bagpiper.site/images/bagpiper-cellar.jpg</video:thumbnail_loc>
+      <video:title>Bagpiper Licor Herbal — The Dark Piper</video:title>
+      <video:description>Video oficial de Bagpiper, licor herbal y trago herbal. Sitio bagpiper.site.</video:description>
+      <video:content_loc>https://bagpiper.site/images/videohome.mp4</video:content_loc>
+      <video:family_friendly>no</video:family_friendly>
+      <video:live>no</video:live>
+    </video:video>
   </url>
 </urlset>

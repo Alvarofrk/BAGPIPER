@@ -1,7 +1,23 @@
 ﻿User-agent: *
 Allow: /
 
-# Disallow admin or private paths if added in the future
-# Disallow: /admin/
+User-agent: Googlebot
+Allow: /
 
-Sitemap: https://bagpiperginoficial.site/sitemap.xml
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://bagpiper.site/sitemap.xml
+Host: https://bagpiper.site

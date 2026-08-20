@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   botanicals,
   darkPiperSymbols,
+  faqs,
   marqueeItems,
   navLinks,
   products,
@@ -615,6 +616,39 @@ function App() {
                     ))}
                   </motion.div>
                 </div>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="faq"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header section-header-center">
+                <span className="section-eyebrow">Preguntas frecuentes</span>
+                <h2 className="section-title">
+                  LICOR <span className="text-outline">HERBAL</span>
+                </h2>
+                <p className="section-desc contact-lead">
+                  Bagpiper es un trago herbal de inspiración americana. Entra en la categoría de licores herbales —
+                  la misma familia de Jägermeister y Fernet — con receta, marca e identidad propias.
+                </p>
+              </motion.div>
+
+              <div className="faq-list">
+                {faqs.map((item) => (
+                  <motion.div variants={fadeUp} key={item.q}>
+                    <details className="faq-item">
+                      <summary>{item.q}</summary>
+                      <p>{item.a}</p>
+                    </details>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </motion.section>

@@ -4,6 +4,7 @@ export const navLinks = [
   { label: "Galería", href: "#mundo" },
   { label: "El Licor", href: "#coleccion" },
   { label: "Botánicos", href: "#botanicos" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 export const stats = [
@@ -21,6 +22,7 @@ export const stats = [
 
 export const marqueeItems = [
   "Herbal Liqueur",
+  "Trago Herbal",
   "The Dark Piper",
   "Est. 2018",
   "Smith & Johnson",
@@ -100,12 +102,31 @@ export const regions = [
   { name: "Frutos", role: "Dulzor botánico" },
 ];
 
+export const faqs = [
+  {
+    q: "¿Qué es Bagpiper?",
+    a: "Bagpiper es un licor herbal — también llamado trago herbal — desarrollado en Estados Unidos en 2018 por Smith & Johnson & Co. Se elabora con hierbas, raíces, especias y botánicos. 35% vol., 750 ml, serve cold. Sitio oficial: bagpiper.site.",
+  },
+  {
+    q: "¿Bagpiper es un trago herbal como Jägermeister o Fernet?",
+    a: "Sí: Bagpiper entra en la misma categoría de licores herbales que Jägermeister y Fernet. No es Jägermeister ni Fernet; es una marca propia, de inspiración americana, pensada para consumo directo y coctelería.",
+  },
+  {
+    q: "¿Cómo se toma Bagpiper?",
+    a: "Serve cold. Se sirve frío, solo o en copa, y también en coctelería. Es un licor herbal de 35% vol. en formato 750 ml.",
+  },
+  {
+    q: "¿Dónde se consigue Bagpiper?",
+    a: "Desde 2024 Bagpiper retoma operaciones y trabaja con importadores y distribuidores de bebidas espirituosas en Latinoamérica. La presencia comercial se desarrolla de forma progresiva en la región.",
+  },
+];
+
 export const products = [
   {
     name: "Bagpiper Herbal Liqueur",
     tag: "The Dark Piper",
     description:
-      "Un licor herbal de inspiración americana, elaborado con una selección de hierbas, raíces, especias y botánicos. Pensado para servirse frío, en copa o en coctelería.",
+      "Bagpiper es un licor herbal — un trago herbal de hierbas, raíces, especias y botánicos. Pertenece a la categoría de licores herbales, la misma familia de Jägermeister y Fernet, con fórmula e identidad propias. Serve cold. 35% vol. 750 ml.",
     notes: ["Hierbas", "Especias", "Raíces", "Botánicos"],
     abv: "35% VOL.",
     volume: "750 ML",
