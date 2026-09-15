@@ -97,6 +97,7 @@ body {
 #contacto,
 #mundo,
 #faq,
+#botella,
 #top,
 #main {
   scroll-margin-top: 5.5rem;
@@ -1470,6 +1471,149 @@ button {
   line-height: 1.5;
 }
 
+.product-studio {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .product-studio {
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 4rem;
+  }
+}
+
+.product-studio-shot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin: 0;
+  padding: 2.5rem 1.5rem 1.5rem;
+  background: radial-gradient(ellipse at 50% 42%, #ffffff 0%, #f3ead8 72%, #e4d4b8 100%);
+  border: 1px solid var(--color-border-strong);
+  cursor: pointer;
+  color: inherit;
+  text-align: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.product-studio-shot:hover,
+.product-studio-shot:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), 0 0 24px var(--color-accent-glow);
+  outline: none;
+}
+
+.product-studio-shot img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 28rem;
+  object-fit: contain;
+}
+
+.product-studio-hint {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #5c4a32;
+}
+
+.product-studio-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.ficha-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(8, 7, 6, 0.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  backdrop-filter: blur(10px);
+}
+
+.ficha-card {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  max-height: min(90vh, 820px);
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+}
+
+@media (min-width: 800px) {
+  .ficha-card {
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+}
+
+.ficha-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-border-strong);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  background: rgba(8, 7, 6, 0.55);
+}
+
+.ficha-close:hover,
+.ficha-close:focus-visible {
+  background: var(--color-accent);
+  color: #1a140c;
+  outline: none;
+}
+
+.ficha-visual {
+  background: radial-gradient(ellipse at 50% 40%, #ffffff 0%, #f3ead8 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.ficha-visual img {
+  width: auto;
+  max-width: 100%;
+  max-height: 28rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.ficha-body {
+  padding: 2rem 1.5rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 800px) {
+  .ficha-body {
+    padding: 3rem 2.25rem;
+    overflow: auto;
+  }
+}
+
 .botanicals-img-copy {
   color: rgba(247, 241, 232, 0.75);
   font-family: var(--font-serif);
@@ -1601,7 +1745,10 @@ button {
   .gallery-item img,
   .product-card-new,
   .heritage-img-wrapper img,
-  .botanicals-img-panel img {
+  .botanicals-img-panel img,
+  .product-studio-shot,
+  .ficha-overlay,
+  .ficha-card {
     transition: none;
   }
 }

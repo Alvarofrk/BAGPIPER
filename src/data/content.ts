@@ -2,6 +2,7 @@ export const navLinks = [
   { label: "Historia", href: "#historia" },
   { label: "Leyenda", href: "#leyenda" },
   { label: "Galería", href: "#mundo" },
+  { label: "Producto", href: "#botella" },
   { label: "El Licor", href: "#coleccion" },
   { label: "Botánicos", href: "#botanicos" },
   { label: "FAQ", href: "#faq" },
@@ -120,6 +121,20 @@ export const faqs = [
     a: "Desde 2024 Bagpiper retoma operaciones y trabaja con importadores y distribuidores de bebidas espirituosas en Latinoamérica. La presencia comercial se desarrolla de forma progresiva en la región.",
   },
 ];
+
+export const servingGuide = {
+  tag: "Ritual de servicio",
+  title: "Serve Cold",
+  description:
+    "La casa recomienda servirlo muy frío. Un vaso corto con hielo, o solo en copa bien helada, deja que las hierbas y las especias se abran sin perder nitidez. También acompaña la coctelería: un perfil herbal que sostiene el trago de principio a fin.",
+  notes: ["Bien frío", "Con hielo", "En copa", "Coctelería"],
+  specs: [
+    { label: "Temperatura", value: "Muy frío" },
+    { label: "Hielo", value: "Corto o largo" },
+    { label: "Momento", value: "Solo o en mix" },
+  ],
+  line: "Conservar fresco y servir al momento. El frío es parte de la receta.",
+};
 
 export const products = [
   {

@@ -4,9 +4,15 @@
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://bagpiper.site/</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper.jpg</image:loc>
+      <image:title>Bagpiper Licor Herbal — Botella 750 ml</image:title>
+      <image:caption>Packshot oficial de Bagpiper Herbal Liqueur sobre fondo blanco. 35% vol. 750 ml. Serve Cold. Smith & Johnson.</image:caption>
+    </image:image>
 
     <image:image>
       <image:loc>https://bagpiper.site/images/bagpiperherbal-og.jpg</image:loc>

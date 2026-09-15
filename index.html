@@ -85,7 +85,17 @@
           "name": "Bagpiper Licor Herbal | Trago Herbal Premium | The Dark Piper",
           "isPartOf": { "@id": "https://bagpiper.site/#website" },
           "about": { "@id": "https://bagpiper.site/#product" },
-          "primaryImageOfPage": "https://bagpiper.site/images/bagpiperherbal-og.jpg",
+          "primaryImageOfPage": {
+            "@type": "ImageObject",
+            "@id": "https://bagpiper.site/#packshot",
+            "url": "https://bagpiper.site/images/bagpiper.jpg",
+            "contentUrl": "https://bagpiper.site/images/bagpiper.jpg",
+            "name": "Bagpiper licor herbal — botella 750 ml fondo blanco",
+            "caption": "Botella de Bagpiper Herbal Liqueur, 35% vol., 750 ml, Serve Cold. Smith & Johnson Master Liquormakers.",
+            "width": 683,
+            "height": 1024,
+            "encodingFormat": "image/jpeg"
+          },
           "description": "Sitio oficial de Bagpiper, licor herbal y trago herbal de inspiración americana.",
           "inLanguage": "es",
           "speakable": {
@@ -102,11 +112,22 @@
           "description": "Licor herbal elaborado con hierbas, raíces, especias y botánicos. Trago herbal de 35% vol. 750 ml. Serve cold. Receta e identidad propias.",
           "category": "Licor herbal",
           "image": [
+            {
+              "@type": "ImageObject",
+              "url": "https://bagpiper.site/images/bagpiper.jpg",
+              "contentUrl": "https://bagpiper.site/images/bagpiper.jpg",
+              "name": "Bagpiper Herbal Liqueur botella 750 ml",
+              "caption": "Packshot oficial de Bagpiper licor herbal sobre fondo blanco. 35% vol. Serve Cold.",
+              "width": 683,
+              "height": 1024
+            },
             "https://bagpiper.site/images/bagpiperherbal-og.jpg",
             "https://bagpiper.site/images/bagpiper-cellar.jpg",
-            "https://bagpiper.site/images/bagpiper-sunset.jpg"
+            "https://bagpiper.site/images/bagpiper-sunset.jpg",
+            "https://bagpiper.site/images/bagpiper-darkness.jpg",
+            "https://bagpiper.site/images/bagpiperherbal-portrait.jpg"
           ],
-          "url": "https://bagpiper.site/",
+          "url": "https://bagpiper.site/#botella",
           "isSimilarTo": [
             { "@type": "Product", "name": "Jägermeister" },
             { "@type": "Product", "name": "Fernet" }

@@ -7,6 +7,7 @@ import {
   navLinks,
   products,
   regions,
+  servingGuide,
   stats,
   timeline,
 } from "./data/content";
@@ -16,14 +17,15 @@ const PORTRAIT_IMG = "/images/bagpiperherbal-portrait.jpg";
 const CELLAR_IMG = "/images/bagpiper-cellar.jpg";
 const DARKNESS_IMG = "/images/bagpiper-darkness.jpg";
 const SUNSET_IMG = "/images/bagpiper-sunset.jpg";
+const PACKSHOT_IMG = "/images/bagpiper.jpg";
 const HERO_VIDEO = "/images/videohome.mp4";
 const SIDE_VIDEO = "/images/bp.mp4";
 const product = products[0];
 
 const gallery = [
-  { src: CELLAR_IMG, label: "CELLAR SESSIONS", alt: "Bagpiper Herbal Liqueur en un lounge nocturno, con humo azul y magenta" },
-  { src: DARKNESS_IMG, label: "HELLO DARKNESS", alt: "Bagpiper Herbal Liqueur sobre barra oscura, con luces rojas y púrpuras" },
-  { src: SUNSET_IMG, label: "SUNSET SESSIONS", alt: "Bagpiper Herbal Liqueur en una terraza al atardecer, con neón Sunset Sessions" },
+  { src: CELLAR_IMG, label: "CELLAR SESSIONS", alt: "Bagpiper licor herbal en lounge nocturno Cellar Sessions, botella 750 ml", width: 1400, height: 787 },
+  { src: DARKNESS_IMG, label: "HELLO DARKNESS", alt: "Bagpiper licor herbal Hello Darkness, botella sobre barra con luces rojas", width: 1400, height: 934 },
+  { src: SUNSET_IMG, label: "SUNSET SESSIONS", alt: "Bagpiper licor herbal Sunset Sessions, botella en terraza al atardecer", width: 1400, height: 787 },
 ];
 
 function App() {
@@ -50,6 +52,7 @@ function App() {
   const sideVideoRef = useRef<HTMLVideoElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [moodIndex, setMoodIndex] = useState(0);
+  const [fichaOpen, setFichaOpen] = useState(false);
   const moodIndexRef = useRef(0);
   moodIndexRef.current = moodIndex;
 
@@ -69,11 +72,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = menuOpen || fichaOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, fichaOpen]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -150,6 +153,36 @@ function App() {
   const handleAgeDecline = () => {
     setAgeVerified(false);
   };
+
+  const openFicha = () => {
+    setFichaOpen(true);
+    if (window.location.hash !== "#ficha") {
+      window.history.pushState(null, "", "#ficha");
+    }
+  };
+
+  const closeFicha = () => {
+    setFichaOpen(false);
+    if (window.location.hash === "#ficha") {
+      window.history.replaceState(null, "", "#botella");
+    }
+  };
+
+  useEffect(() => {
+    if (window.location.hash === "#ficha") setFichaOpen(true);
+    const onHash = () => setFichaOpen(window.location.hash === "#ficha");
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    if (!fichaOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeFicha();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [fichaOpen]);
 
   return (
     <>
@@ -413,7 +446,7 @@ function App() {
                 <motion.div variants={fadeUp} className="heritage-img-wrapper">
                   <img
                     src={PORTRAIT_IMG}
-                    alt="Bagpiper Herbal Liqueur, botella ámbar con etiqueta vintage y el emblema del Dark Piper"
+                    alt="Bagpiper licor herbal en destilería: botella ámbar, botánicos y alambique de cobre"
                     width={900}
                     height={1200}
                     loading="lazy"
@@ -490,7 +523,7 @@ function App() {
               <div className="gallery-grid gallery-grid-night">
                 {gallery.map((item) => (
                   <motion.div variants={fadeUp} key={item.src} className="gallery-item">
-                    <img src={item.src} alt={item.alt} loading="lazy" />
+                    <img src={item.src} alt={item.alt} width={item.width} height={item.height} loading="lazy" />
                     <div className="gallery-overlay">
                       <span className="gallery-text">{item.label}</span>
                     </div>
@@ -501,7 +534,7 @@ function App() {
           </motion.section>
 
           <motion.section
-            id="coleccion"
+            id="botella"
             className="section"
             initial="hidden"
             whileInView="visible"
@@ -510,21 +543,35 @@ function App() {
           >
             <div className="container">
               <motion.div variants={fadeUp} className="section-header">
-                <span className="section-eyebrow">The Collection</span>
-                <h2 className="section-title">LA FIRMA</h2>
+                <span className="section-eyebrow">Product shot</span>
+                <h2 className="section-title">LA BOTELLA</h2>
+                <p className="section-desc">
+                  Ficha de producto: Bagpiper Herbal Liqueur, 35% vol., 750 ml. Haz clic en la botella para abrir la
+                  ficha completa.
+                </p>
               </motion.div>
 
-              <motion.article variants={fadeUp} className="product-featured">
-                <div className="product-featured-img">
+              <div className="product-studio">
+                <motion.button
+                  variants={fadeUp}
+                  type="button"
+                  className="product-studio-shot"
+                  onClick={openFicha}
+                  aria-haspopup="dialog"
+                  aria-expanded={fichaOpen}
+                  aria-controls="ficha-bagpiper"
+                >
                   <img
-                    src={CELLAR_IMG}
-                    alt="Bagpiper Herbal Liqueur en un lounge nocturno, con humo azul y magenta sobre la barra"
-                    width={1400}
-                    height={787}
+                    src={PACKSHOT_IMG}
+                    alt="Botella de Bagpiper licor herbal 750 ml, fondo blanco, etiqueta vintage Smith & Johnson, 35% vol. Serve Cold"
+                    width={683}
+                    height={1024}
                     loading="lazy"
                   />
-                </div>
-                <div className="product-featured-body">
+                  <span className="product-studio-hint">Clic para ver la ficha</span>
+                </motion.button>
+
+                <motion.div variants={fadeUp} className="product-studio-copy">
                   <div className="product-card-tag">{product.tag}</div>
                   <h3 className="product-card-title">{product.name}</h3>
                   <p className="product-card-desc">{product.description}</p>
@@ -549,11 +596,61 @@ function App() {
                       </span>
                     ))}
                   </div>
-                  <p className="product-line">
-                    Developed in the USA — 2018
-                    <br />
-                    Reintroduced internationally — 2024
-                  </p>
+                  <button type="button" className="btn btn-primary" onClick={openFicha}>
+                    Abrir ficha
+                  </button>
+                </motion.div>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            id="coleccion"
+            className="section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <div className="container">
+              <motion.div variants={fadeUp} className="section-header">
+                <span className="section-eyebrow">The Collection</span>
+                <h2 className="section-title">LA FIRMA</h2>
+                <p className="section-desc">
+                  Cómo tomarlo: frío, con hielo o en copa. La recomendación de servicio de Bagpiper.
+                </p>
+              </motion.div>
+
+              <motion.article variants={fadeUp} className="product-featured">
+                <div className="product-featured-img">
+                  <img
+                    src={CELLAR_IMG}
+                    alt="Bagpiper licor herbal Cellar Sessions, botella en lounge nocturno para coctelería"
+                    width={1400}
+                    height={787}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="product-featured-body">
+                  <div className="product-card-tag">{servingGuide.tag}</div>
+                  <h3 className="product-card-title">{servingGuide.title}</h3>
+                  <p className="product-card-desc">{servingGuide.description}</p>
+                  <div className="product-specs">
+                    {servingGuide.specs.map((spec) => (
+                      <div key={spec.label}>
+                        <span>{spec.label}</span>
+                        <strong>{spec.value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="product-notes">
+                    {servingGuide.notes.map((note) => (
+                      <span key={note} className="note-pill">
+                        {note}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="product-line">{servingGuide.line}</p>
                 </div>
               </motion.article>
             </div>
@@ -572,7 +669,7 @@ function App() {
                 <motion.div variants={fadeUp} className="botanicals-img-panel">
                   <img
                     src={PORTRAIT_IMG}
-                    alt="Botánicos alrededor de Bagpiper: hojas, bayas, anís estrellado y brezo púrpura"
+                    alt="Bagpiper licor herbal: botella y botánicos — hierbas, bayas, anís estrellado y brezo"
                     width={900}
                     height={1200}
                     loading="lazy"
@@ -677,7 +774,7 @@ function App() {
               <motion.div variants={fadeUp} className="contact-panel">
                 <img
                   src={DARKNESS_IMG}
-                  alt=""
+                  alt="Bagpiper licor herbal Hello Darkness, botella sobre barra nocturna"
                   className="contact-panel-bg"
                   width={1400}
                   height={934}
@@ -707,6 +804,75 @@ function App() {
           </div>
         </footer>
       </div>
+
+      <AnimatePresence>
+        {fichaOpen && (
+          <motion.div
+            className="ficha-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeFicha}
+          >
+            <motion.div
+              id="ficha-bagpiper"
+              className="ficha-card"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="ficha-title"
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button type="button" className="ficha-close" onClick={closeFicha} aria-label="Cerrar ficha">
+                Cerrar
+              </button>
+              <div className="ficha-visual">
+                <img
+                  src={PACKSHOT_IMG}
+                  alt="Bagpiper Herbal Liqueur — botella de licor herbal 750 ml, 35% vol, Serve Cold, Smith & Johnson"
+                  width={683}
+                  height={1024}
+                />
+              </div>
+              <div className="ficha-body">
+                <p className="product-card-tag">{product.tag}</p>
+                <h2 id="ficha-title" className="product-card-title">
+                  {product.name}
+                </h2>
+                <p className="product-card-desc">{product.description}</p>
+                <div className="product-specs">
+                  <div>
+                    <span>Alcohol</span>
+                    <strong>{product.abv}</strong>
+                  </div>
+                  <div>
+                    <span>Formato</span>
+                    <strong>{product.volume}</strong>
+                  </div>
+                  <div>
+                    <span>Servicio</span>
+                    <strong>{product.serve}</strong>
+                  </div>
+                </div>
+                <div className="product-notes">
+                  {product.notes.map((note) => (
+                    <span key={note} className="note-pill">
+                      {note}
+                    </span>
+                  ))}
+                </div>
+                <p className="product-line">
+                  Developed in the USA — 2018
+                  <br />
+                  Reintroduced internationally — 2024
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
