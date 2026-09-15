@@ -130,8 +130,8 @@ export const servingGuide = {
   notes: ["Bien frío", "Con hielo", "En copa", "Coctelería"],
   specs: [
     { label: "Temperatura", value: "Muy frío" },
-    { label: "Hielo", value: "Corto o largo" },
-    { label: "Momento", value: "Solo o en mix" },
+    { label: "Hielo", value: "Recomendado" },
+    { label: "Copa", value: "Bien helada" },
   ],
   line: "Conservar fresco y servir al momento. El frío es parte de la receta.",
 };
