@@ -4,47 +4,88 @@
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://bagpiper.site/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
 
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper.jpg</image:loc>
-      <image:title>Bagpiper Licor Herbal — Botella 750 ml</image:title>
-      <image:caption>Packshot oficial de Bagpiper Herbal Liqueur sobre fondo blanco. 35% vol. 750 ml. Serve Cold. Smith & Johnson.</image:caption>
-    </image:image>
-
-    <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiperherbal-og.jpg</image:loc>
-      <image:title>Bagpiper Licor Herbal — The Dark Piper</image:title>
-      <image:caption>Bagpiper, licor herbal y trago herbal de inspiración americana. 35% vol. Serve cold.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-herbal-packshot.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Nueva presentación 750 ml</image:title>
+      <image:caption>Packshot oficial de Bagpiper Herbal Liqueur. 35% vol. 750 ml. Serve Cold. Smith &amp; Johnson.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-cellar.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — Cellar Sessions</image:title>
-      <image:caption>Trago herbal Bagpiper en lounge nocturno.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-london-dry.jpg</image:loc>
+      <image:title>Bagpiper London Dry Gin Classic</image:title>
+      <image:caption>Gin London Dry Bagpiper Classic, vapour infused, 40% vol.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-darkness.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — Hello Darkness</image:title>
-      <image:caption>Licor herbal Bagpiper sobre barra oscura.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-fruta-del-bosque.jpg</image:loc>
+      <image:title>Bagpiper London Dry Gin Black Pink</image:title>
+      <image:caption>Gin rosado Bagpiper Black Pink con frutos del bosque, 40% vol.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-sunset.jpg</image:loc>
-      <image:title>Bagpiper Herbal Liqueur — Sunset Sessions</image:title>
-      <image:caption>Bagpiper licor herbal en terraza al atardecer.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-og.jpg</image:loc>
+      <image:title>Bagpiper — Herbal Liqueur &amp; London Dry Gin</image:title>
+      <image:caption>Línea de licores herbales y gines de alta calidad desarrollada en Lamoille, Nevada — USA.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiperherbal-hero.jpg</image:loc>
-      <image:title>Bagpiper Licor Herbal — Destilería</image:title>
-      <image:caption>Botella de Bagpiper con botánicos y alambique de cobre.</image:caption>
+      <image:loc>https://bagpiper.site/images/bagpiper-nightclub.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Night Sessions</image:title>
+      <image:caption>Licor herbal Bagpiper sobre barra nocturna.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-herbal-vertical.jpg</image:loc>
+      <image:title>Bagpiper Herbal Liqueur — Botella verde</image:title>
+      <image:caption>Nueva presentación de Bagpiper Herbal Liqueur sobre barra.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-herbal-ritual.jpg</image:loc>
+      <image:title>Cóctel Herbal Orange con Bagpiper</image:title>
+      <image:caption>Bagpiper Herbal Liqueur con hielo y naranja en vaso corto.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-herbal-tonic.jpg</image:loc>
+      <image:title>Cóctel Dark Piper Tonic con Bagpiper</image:title>
+      <image:caption>Bagpiper Herbal Liqueur con tónica, limón y romero.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-bar.jpg</image:loc>
+      <image:title>Bagpiper Classic Gin — Bar</image:title>
+      <image:caption>Gin tonic con Bagpiper London Dry Gin Classic.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-limon.jpg</image:loc>
+      <image:title>Piper Classic Tonic — gin tonic Bagpiper con limón</image:title>
+      <image:caption>Bagpiper London Dry Gin Classic con tónica y piel de limón en copa balón.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-verano.jpg</image:loc>
+      <image:title>Black Pink Berry Tonic — gin tonic rosado Bagpiper</image:title>
+      <image:caption>Bagpiper London Dry Gin Black Pink con tónica y frutos del bosque.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-copa.jpg</image:loc>
+      <image:title>Bagpiper Black Pink Gin en copa</image:title>
+      <image:caption>Gin rosado Bagpiper Black Pink servido con moras y frambuesas.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-jardin.jpg</image:loc>
+      <image:title>Bagpiper Black Pink Gin — Jardín</image:title>
+      <image:caption>Bagpiper London Dry Gin Black Pink con frutos del bosque al aire libre.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-gin-tonic.jpg</image:loc>
+      <image:title>Bagpiper Classic Gin Tonic</image:title>
+      <image:caption>Bagpiper London Dry Gin Classic con copa balón y hielo.</image:caption>
     </image:image>
 
     <video:video>
-      <video:thumbnail_loc>https://bagpiper.site/images/bagpiper-cellar.jpg</video:thumbnail_loc>
-      <video:title>Bagpiper Licor Herbal — The Dark Piper</video:title>
-      <video:description>Video oficial de Bagpiper, licor herbal y trago herbal. Sitio bagpiper.site.</video:description>
-      <video:content_loc>https://bagpiper.site/images/videohome.mp4</video:content_loc>
+      <video:thumbnail_loc>https://bagpiper.site/images/bagpiper-hero-poster.jpg</video:thumbnail_loc>
+      <video:title>Bagpiper — Herbal Liqueur &amp; London Dry Gin</video:title>
+      <video:description>Reel oficial de Bagpiper: Herbal Liqueur en su nueva presentación y London Dry Gin Classic y Black Pink. Línea de gines y licores herbales desarrollada en Lamoille, Nevada.</video:description>
+      <video:content_loc>https://bagpiper.site/images/bagpiper-reel.mp4</video:content_loc>
+      <video:duration>20</video:duration>
+      <video:publication_date>2026-10-31T00:00:00+00:00</video:publication_date>
       <video:family_friendly>no</video:family_friendly>
       <video:live>no</video:live>
     </video:video>
