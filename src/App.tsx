@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import {
   BRAND_STATEMENT,
   botanicals,
@@ -6,13 +6,16 @@ import {
   expressions,
   faqs,
   ginHighlights,
+  ginProfile,
   herbalHighlights,
+  herbalProfile,
   cocktails,
   marqueeItems,
   navLinks,
   regions,
   stats,
   timeline,
+  type Page,
 } from "./data/content";
 import {
   motion,
@@ -63,8 +66,10 @@ const moodSlides = [
   { src: GIN.pinkGlass, label: "London Dry · Black Pink" },
 ];
 
+type FilmItem = { src: string; label: string; alt: string };
+
 // Cinta de galería: dos filas que corren en sentido contrario, alternando herbal y gin.
-const filmRows = [
+const filmRows: FilmItem[][] = [
   [
     { src: NIGHTCLUB_IMG, label: "Herbal · Night Sessions", alt: "Bagpiper Herbal Liqueur nueva presentación sobre barra de discoteca con luces violetas" },
     { src: GIN.classicBar, label: "Classic Gin · Bar", alt: "Bagpiper London Dry Gin Classic con copa de gin tonic en un bar" },
@@ -83,7 +88,22 @@ const filmRows = [
   ],
 ];
 
+const ginFilmRow: FilmItem[] = [
+  { src: GIN.classicBar, label: "Classic · Bar", alt: "Bagpiper London Dry Gin Classic con gin tonic en un bar" },
+  { src: GIN.pinkGarden, label: "Black Pink · Garden", alt: "Bagpiper Black Pink gin con frutos del bosque en un jardín" },
+  { src: GIN.classicTonic, label: "Classic · Gin Tonic", alt: "Bagpiper Classic gin con copa balón y hielo" },
+  { src: GIN.pinkSummer, label: "Black Pink · Summer", alt: "Bagpiper Black Pink gin rosado sobre mármol con frutos rojos" },
+  { src: GIN.classicLemon, label: "Classic · Lemon", alt: "Gin tonic Bagpiper Classic con piel de limón" },
+  { src: GIN.pinkGlass, label: "Black Pink · Night", alt: "Bagpiper Black Pink gin servido con moras y frambuesas" },
+];
+
 const accentStyle = (id: string) => ({ "--expr": EXPRESSION_ACCENTS[id] }) as CSSProperties;
+
+// React 18 solo emite el atributo en minúsculas; con `fetchPriority` avisa y no lo escribe en el HTML prerenderizado.
+const HIGH_PRIORITY = { fetchpriority: "high" } as Record<string, string>;
+
+// Retraso escalonado para las animaciones CSS de entrada (no dependen de JS: el texto del hero se pinta sin hidratar).
+const revealDelay = (i: number) => ({ animationDelay: `${0.1 * i}s` }) as CSSProperties;
 
 function ParallaxImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -97,12 +117,30 @@ function ParallaxImg({ src, alt, className }: { src: string; alt: string; classN
   );
 }
 
-function App() {
+function FilmStrip({ rows }: { rows: FilmItem[][] }) {
+  return (
+    <div className="film-strip">
+      {rows.map((row, r) => (
+        <div key={r} className={`film-row ${r % 2 ? "film-row--reverse" : ""}`}>
+          {/* La fila se duplica para que el desplazamiento sea continuo; la copia queda oculta a lectores de pantalla. */}
+          {[...row, ...row].map((item, i) => (
+            <figure key={`${item.src}-${i}`} className="film-item" aria-hidden={i >= row.length}>
+              <img src={item.src} alt={i >= row.length ? "" : item.alt} loading="lazy" />
+              <figcaption>{item.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App({ page }: { page: Page }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [ageVerified, setAgeVerified] = useState<boolean | null>(() => {
-    return sessionStorage.getItem("bagpiper_age_ok") === "true" ? true : null;
-  });
+  // Arranca en null también en el cliente para que la hidratación coincida con el HTML prerenderizado;
+  // el script inline del <head> oculta el aviso por CSS si la edad ya se confirmó en esta sesión.
+  const [ageVerified, setAgeVerified] = useState<boolean | null>(null);
 
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -117,6 +155,13 @@ function App() {
     },
   };
 
+  const inView = {
+    initial: "hidden",
+    whileInView: "visible",
+    viewport: { once: true, margin: "-100px" },
+    variants: staggerContainer,
+  } as const;
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const reelFillRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [reelChapter, setReelChapter] = useState(0);
@@ -126,11 +171,21 @@ function App() {
 
   const ficha = expressions.find((e) => e.id === fichaId) ?? null;
   const ginExpressions = expressions.filter((e) => e.family === "gin");
+  const pageFaqs = faqs.filter((f) => f.pages.includes(page));
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("bagpiper_age_ok") === "true") setAgeVerified(true);
+    } catch {
+      // Almacenamiento bloqueado: se muestra el aviso de edad.
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -151,12 +206,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || page !== "home") return;
     const id = window.setInterval(() => {
       setMoodIndex((i) => (i + 1) % moodSlides.length);
     }, 4000);
     return () => window.clearInterval(id);
-  }, [reduceMotion]);
+  }, [reduceMotion, page]);
 
   useEffect(() => {
     const hero = videoRef.current;
@@ -212,7 +267,12 @@ function App() {
   };
 
   const handleAgeAccept = () => {
-    sessionStorage.setItem("bagpiper_age_ok", "true");
+    try {
+      sessionStorage.setItem("bagpiper_age_ok", "true");
+    } catch {
+      // Sin almacenamiento la confirmación dura solo esta vista.
+    }
+    document.documentElement.dataset.ageOk = "1";
     setAgeVerified(true);
   };
 
@@ -230,7 +290,7 @@ function App() {
   const closeFicha = () => {
     setFichaId(null);
     if (window.location.hash.startsWith("#ficha")) {
-      window.history.replaceState(null, "", "#expresiones");
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
   };
 
@@ -256,6 +316,870 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [ficha]);
 
+  const currentPath = page === "home" ? "/" : `/${page}`;
+
+  /* ---------- Bloques compartidos ---------- */
+
+  const sectionHeader = (eyebrow: string, title: ReactNode, desc?: ReactNode, center = true) => (
+    <motion.div variants={fadeUp} className={`section-header ${center ? "section-header-center" : ""}`}>
+      <span className="section-eyebrow">{eyebrow}</span>
+      <h2 className="section-title">{title}</h2>
+      {desc && <p className="section-desc">{desc}</p>}
+    </motion.div>
+  );
+
+  const cocktailsSection = (filter: (expressionId: string) => boolean, eyebrow: string, title: ReactNode, desc: ReactNode) => (
+    <motion.section id="cocteles" className="section" {...inView}>
+      <div className="container">
+        {sectionHeader(eyebrow, title, desc)}
+        <div className={`cocktail-grid ${page === "home" ? "" : "cocktail-grid--duo"}`}>
+          {cocktails
+            .filter((c) => filter(c.expressionId))
+            .map((c) => (
+              <motion.article variants={fadeUp} key={c.id} className="cocktail-card" style={accentStyle(c.expressionId)}>
+                <div className="cocktail-media">
+                  <img
+                    src={c.image}
+                    alt={c.imageAlt}
+                    width={c.imageWidth}
+                    height={c.imageHeight}
+                    loading="lazy"
+                    style={c.imagePosition ? { objectPosition: c.imagePosition } : undefined}
+                  />
+                  <span className="cocktail-glass">{c.glass}</span>
+                </div>
+                <div className="cocktail-body">
+                  <span className="cocktail-expression">{c.expression}</span>
+                  <h3 className="cocktail-name">{c.name}</h3>
+                  <p className="cocktail-tagline">{c.tagline}</p>
+                  <ul className="cocktail-ingredients">
+                    {c.ingredients.map((ing) => (
+                      <li key={ing}>{ing}</li>
+                    ))}
+                  </ul>
+                  <ol className="cocktail-steps">
+                    {c.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              </motion.article>
+            ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+
+  const faqSection = (title: ReactNode, desc: ReactNode) => (
+    <motion.section id="faq" className="section" {...inView}>
+      <div className="container">
+        {sectionHeader("Preguntas frecuentes", title, desc)}
+        <div className="faq-list">
+          {pageFaqs.map((item) => (
+            <motion.div variants={fadeUp} key={item.q}>
+              <details className="faq-item">
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+
+  const profileSection = (
+    id: string,
+    eyebrow: string,
+    title: ReactNode,
+    desc: ReactNode,
+    items: { title: string; label: string; text: string }[],
+    accentId: string
+  ) => (
+    <motion.section id={id} className="section" {...inView}>
+      <div className="container">
+        {sectionHeader(eyebrow, title, desc)}
+        <div className="profile-grid" style={accentStyle(accentId)}>
+          {items.map((item, i) => (
+            <motion.article variants={fadeUp} key={item.title} className="profile-card">
+              <span className="profile-num">0{i + 1}</span>
+              <span className="profile-label">{item.label}</span>
+              <h3 className="profile-title">{item.title}</h3>
+              <p className="profile-text">{item.text}</p>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+
+  const crossLink = (to: "herbal" | "gin") =>
+    to === "gin" ? (
+      <section className="section crosslink" aria-label="Descubre Bagpiper London Dry Gin">
+        <div className="container">
+          <a href="/gin" className="split-panel split-panel--gin crosslink-panel" style={accentStyle("black-pink")}>
+            <ParallaxImg src={GIN.pinkGlass} alt="Bagpiper London Dry Gin Black Pink servido en copa balón" />
+            <span className="split-panel-shade" aria-hidden="true" />
+            <span className="split-panel-content">
+              <span className="split-panel-tag">Descubre también · Expresión Gin</span>
+              <span className="split-panel-title">Bagpiper London Dry Gin</span>
+              <span className="split-panel-line">Classic &amp; Black Pink. Seco, fresco y botánico.</span>
+              <span className="split-panel-cta">Ver Bagpiper Gin</span>
+            </span>
+          </a>
+        </div>
+      </section>
+    ) : (
+      <section className="section crosslink" aria-label="Descubre Bagpiper Herbal Liqueur">
+        <div className="container">
+          <a href="/herbal" className="split-panel crosslink-panel" style={accentStyle("herbal")}>
+            <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una discoteca" />
+            <span className="split-panel-shade" aria-hidden="true" />
+            <span className="split-panel-content">
+              <span className="split-panel-tag">Descubre también · Expresión Herbal</span>
+              <span className="split-panel-title">Bagpiper Herbal Liqueur</span>
+              <span className="split-panel-line">La receta original. Oscuro, herbal y bien frío.</span>
+              <span className="split-panel-cta">Ver Bagpiper Herbal</span>
+            </span>
+          </a>
+        </div>
+      </section>
+    );
+
+  const breadcrumb = (label: string) => (
+    <nav className="breadcrumb hero-reveal" aria-label="Ruta de navegación">
+      <a href="/">Inicio</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{label}</span>
+    </nav>
+  );
+
+  const specChips = (items: string[]) => (
+    <div className="product-hero-specs hero-reveal" style={revealDelay(3)}>
+      {items.map((item) => (
+        <span key={item}>{item}</span>
+      ))}
+    </div>
+  );
+
+  /* ---------- Portada ---------- */
+
+  const homeContent = (
+    <>
+      <section className="container" id="top">
+        <div className="hero-bento">
+          <div className="bento-card bento-card-main hero-reveal">
+            <video
+              ref={videoRef}
+              className="bg-video"
+              muted
+              loop
+              playsInline
+              preload="none"
+              poster={HERO_POSTER}
+              aria-hidden="true"
+            />
+            <div className="overlay" />
+            <div className="content">
+              <span className="section-eyebrow">Lamoille, Nevada · USA · Smith &amp; Johnson &amp; Co.</span>
+              <h1 className="hero-title">
+                BAGPIPER <span className="accent hero-title-sub">HERBAL LIQUEUR &amp; LONDON DRY GIN</span>
+              </h1>
+              <p className="section-desc">
+                {BRAND_STATEMENT} Dos expresiones, una misma leyenda: la receta herbal original y un London Dry Gin en
+                versiones Classic y Black Pink.
+              </p>
+              <div className="hero-actions">
+                <a href="#elige" className="btn btn-primary">
+                  Ver las expresiones
+                </a>
+                <a href="#contacto" className="btn btn-outline">
+                  Distribución
+                </a>
+              </div>
+            </div>
+            <div className="reel-nav" aria-label="Capítulos del video">
+              {REEL_CHAPTERS.map((chapter, i) => (
+                <button
+                  key={chapter.id}
+                  type="button"
+                  className={`reel-chapter reel-chapter--${chapter.id} ${reelChapter === i ? "is-active" : ""}`}
+                  onClick={() => seekReel(i)}
+                  aria-pressed={reelChapter === i}
+                >
+                  <span className="reel-chapter-num">0{i + 1}</span>
+                  <span className="reel-chapter-text">
+                    <strong>{chapter.label}</strong>
+                    <span>{chapter.sub}</span>
+                  </span>
+                  <span className="reel-chapter-bar" aria-hidden="true">
+                    <span
+                      ref={(el) => {
+                        reelFillRefs.current[i] = el;
+                      }}
+                    />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bento-side-cards">
+            <div className="bento-card bento-card-stat bento-card-mini-video hero-reveal" style={revealDelay(1)}>
+              <div className="mood-rotator" aria-hidden="true">
+                {moodSlides.map((slide, i) => (
+                  <img key={slide.src} src={slide.src} alt="" className={`mood-slide ${moodIndex === i ? "is-active" : ""}`} />
+                ))}
+              </div>
+              <div className="side-video-overlay" />
+              <div className="stat-content">
+                <div className="stat-label">The Dark Piper</div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={moodIndex}
+                    className="stat-val stat-val-sm"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    {moodSlides[moodIndex].label}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+
+            <div className="bento-card bento-card-stat hero-reveal" style={revealDelay(2)}>
+              <div className="stat-content stat-content-stack">
+                {stats.map((stat) => (
+                  <div key={stat.value} className="stat-row">
+                    <div className="stat-label">{stat.title}</div>
+                    <div className="stat-val">{stat.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <a
+              href="#expresiones"
+              className="bento-card bento-card-stat bento-card-label hero-reveal"
+              style={revealDelay(3)}
+              aria-label="Ver las expresiones de Bagpiper"
+            >
+              <div className="spec-label">
+                <p className="spec-label-eyebrow">The Expressions</p>
+                <p className="spec-label-abv">02</p>
+                <p className="spec-label-vol">Expresiones</p>
+                <div className="spec-label-rule" />
+                <div className="spec-label-row">
+                  <span>Herbal 35%</span>
+                  <span className="spec-label-serve">Gin 40%</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div className="marquee-wrapper" aria-hidden="true">
+        <div className="marquee-content">
+          {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
+            <div key={`${item}-${index}`} className="marquee-item">
+              <span>✦</span> {item}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <section id="elige" className="split-band" aria-labelledby="elige-title">
+        <motion.div className="container split-band-head" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
+          <span className="section-eyebrow">Elige tu expresión</span>
+          <h2 id="elige-title" className="section-title">
+            DOS EXPRESIONES. <span className="accent">UNA LEYENDA.</span>
+          </h2>
+        </motion.div>
+
+        <div className="split-band-panels">
+          <a href="/herbal" className="split-panel" style={accentStyle("herbal")}>
+            <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur, nueva presentación, en la barra de una discoteca" />
+            <span className="split-panel-shade" aria-hidden="true" />
+            <span className="split-panel-content">
+              <span className="split-panel-tag">01 · Expresión Herbal</span>
+              <span className="split-panel-title">Herbal Liqueur</span>
+              <span className="split-panel-line">Oscuro. Herbal. Bien frío.</span>
+              <span className="split-panel-meta">35% Vol. · 750 ml · Serve Cold</span>
+              <span className="split-panel-cta">Descubrir Bagpiper Herbal</span>
+            </span>
+          </a>
+          <a href="/gin" className="split-panel split-panel--gin" style={accentStyle("black-pink")}>
+            <ParallaxImg src={GIN.pinkGlass} alt="Bagpiper London Dry Gin Black Pink servido en copa balón con frutos del bosque" />
+            <span className="split-panel-shade" aria-hidden="true" />
+            <span className="split-panel-content">
+              <span className="split-panel-tag">02 · Expresión Gin</span>
+              <span className="split-panel-title">London Dry Gin</span>
+              <span className="split-panel-line">Seco. Fresco. Botánico.</span>
+              <span className="split-panel-meta">40% Vol. · Classic &amp; Black Pink</span>
+              <span className="split-panel-cta">Descubrir Bagpiper Gin</span>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <motion.section id="herbal" className="section feature-section herbal-section" {...inView}>
+        <span className="feature-bgword" aria-hidden="true">
+          HERBAL
+        </span>
+        <div className="container">
+          <div className="gin-layout feature-layout--reverse">
+            <motion.div variants={fadeUp} className="gin-mosaic">
+              <img src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro de la nueva presentación, sobre barra nocturna" width={900} height={1200} loading="lazy" />
+              <img src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser en una discoteca" width={1280} height={720} loading="lazy" />
+              <img src={CLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una fiesta" width={1280} height={720} loading="lazy" />
+            </motion.div>
+
+            <div className="gin-content">
+              <motion.div variants={fadeUp} className="section-header gin-header">
+                <span className="section-eyebrow">Expresión Herbal</span>
+                <h2 className="section-title">
+                  BAGPIPER <span className="text-outline">HERBAL LIQUEUR</span>
+                </h2>
+                <p className="section-desc">
+                  La receta original de la casa, desarrollada en Lamoille, Nevada: un licor herbal oscuro y envolvente de
+                  hierbas, raíces, especias y botánicos. Nueva presentación en botella verde profundo. Se sirve muy frío,
+                  solo o en coctelería.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="gin-highlights">
+                {herbalHighlights.map((item) => (
+                  <div key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="gin-variants">
+                <button type="button" className="gin-variant" style={accentStyle("herbal")} onClick={() => openFicha("herbal")} aria-haspopup="dialog">
+                  <span className="gin-variant-dot" aria-hidden="true" />
+                  <span className="gin-variant-text">
+                    <strong>Original Recipe</strong>
+                    <span>Hierbas · Raíces · Especias · Serve Cold</span>
+                  </span>
+                  <span className="gin-variant-cta">Ficha</span>
+                </button>
+                <a href="/herbal" className="feature-more">
+                  Todo sobre Bagpiper Herbal Liqueur
+                </a>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.section id="gin" className="section feature-section gin-section" {...inView}>
+        <span className="feature-bgword" aria-hidden="true">
+          GIN
+        </span>
+        <div className="container">
+          <div className="gin-layout">
+            <motion.div variants={fadeUp} className="gin-mosaic">
+              <img src={GIN.classicBar} alt="Bagpiper London Dry Gin Classic con copa de gin tonic en un bar nocturno" width={718} height={1086} loading="lazy" />
+              <img src={GIN.classicTonic} alt="Bagpiper London Dry Gin Classic y copa balón con hielo" width={1023} height={701} loading="lazy" />
+              <img src={GIN.pinkGarden} alt="Bagpiper London Dry Gin Black Pink con frutos del bosque en un jardín" width={1023} height={729} loading="lazy" />
+            </motion.div>
+
+            <div className="gin-content">
+              <motion.div variants={fadeUp} className="section-header gin-header">
+                <span className="section-eyebrow">Expresión Gin</span>
+                <h2 className="section-title">
+                  BAGPIPER <span className="text-outline">LONDON DRY GIN</span>
+                </h2>
+                <p className="section-desc">
+                  Desarrollada en Lamoille, Nevada, la expresión gin de Bagpiper es un London Dry infusionado al vapor y
+                  destilado a partir de 100% grano. Dos versiones, una misma firma: el Classic, seco y cítrico, y el Black
+                  Pink, con frutos del bosque.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="gin-highlights">
+                {ginHighlights.map((item) => (
+                  <div key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="gin-variants">
+                {ginExpressions.map((expr) => (
+                  <button key={expr.id} type="button" className="gin-variant" style={accentStyle(expr.id)} onClick={() => openFicha(expr.id)} aria-haspopup="dialog">
+                    <span className="gin-variant-dot" aria-hidden="true" />
+                    <span className="gin-variant-text">
+                      <strong>{expr.short}</strong>
+                      <span>{expr.notes.slice(0, 3).join(" · ")}</span>
+                    </span>
+                    <span className="gin-variant-cta">Ficha</span>
+                  </button>
+                ))}
+                <a href="/gin" className="feature-more">
+                  Todo sobre Bagpiper London Dry Gin
+                </a>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.section id="expresiones" className="section" {...inView}>
+        <div className="container">
+          {sectionHeader(
+            "La colección",
+            <>
+              LA COLECCIÓN <span className="accent">BAGPIPER</span>
+            </>,
+            <>
+              {BRAND_STATEMENT} Herbal Liqueur y London Dry Gin en versiones Classic y Black Pink: abre la ficha de cada
+              botella.
+            </>
+          )}
+
+          <div className="expr-grid">
+            {expressions.map((expr) => (
+              <motion.button
+                variants={fadeUp}
+                key={expr.id}
+                type="button"
+                className={`expr-card ${expr.studio ? "expr-card--studio" : ""}`}
+                style={accentStyle(expr.id)}
+                onClick={() => openFicha(expr.id)}
+                aria-haspopup="dialog"
+                aria-label={`Ver ficha de Bagpiper ${expr.name} ${expr.short}`}
+              >
+                <div className="expr-card-media">
+                  <img src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
+                  <span className="expr-card-family">{expr.familyLabel}</span>
+                </div>
+                <div className="expr-card-body">
+                  <span className="expr-card-tag">{expr.tag}</span>
+                  <h3 className="expr-card-title">
+                    {expr.name}
+                    <span>{expr.short}</span>
+                  </h3>
+                  <p className="expr-card-line">{expr.line}</p>
+                  <div className="expr-card-specs">
+                    <span>{expr.abv}</span>
+                    <span>{expr.volume}</span>
+                    <span>{expr.serve}</span>
+                  </div>
+                  <span className="expr-card-cta">Ver ficha</span>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {cocktailsSection(
+        () => true,
+        "Cócteles de la casa",
+        <>
+          CÓMO SE TOMA <span className="accent">BAGPIPER</span>
+        </>,
+        "Frío y directo para el licor herbal; en copa balón con tónica para el gin. Cuatro recetas de la casa, dos por expresión."
+      )}
+
+      <motion.section id="historia" className="section" {...inView}>
+        <div className="container">
+          {sectionHeader(
+            "Sobre Nosotros",
+            <>
+              DESARROLLADO EN USA <span className="accent">LAMOILLE, NEVADA</span>
+            </>,
+            <>
+              {BRAND_STATEMENT} Creada en 2018 por Smith &amp; Johnson &amp; Co., compañía dedicada al desarrollo y
+              comercialización de bebidas espirituosas, y reintroducida internacionalmente en 2024.
+            </>
+          )}
+
+          <div className="heritage-layout">
+            <motion.div variants={fadeUp} className="timeline">
+              {timeline.slice(0, 2).map((item) => (
+                <article key={item.year} className="timeline-item">
+                  <span className="timeline-year">{item.year}</span>
+                  <h3 className="timeline-title">{item.title}</h3>
+                  <p className="timeline-text">{item.text}</p>
+                </article>
+              ))}
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="heritage-img-wrapper">
+              <img src={HERBAL_PARTY_IMG} alt="Nueva presentación de Bagpiper Herbal Liqueur junto a un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="timeline">
+              {timeline.slice(2).map((item) => (
+                <article key={item.year} className="timeline-item">
+                  <span className="timeline-year">{item.year}</span>
+                  <h3 className="timeline-title">{item.title}</h3>
+                  <p className="timeline-text">{item.text}</p>
+                </article>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.section id="leyenda" className="section" {...inView}>
+        <div className="container">
+          <motion.div variants={fadeUp} className="legend-intro">
+            <div>
+              <span className="section-eyebrow">La identidad</span>
+              <h2 className="section-title">
+                EL <span className="text-outline">DARK PIPER</span>
+              </h2>
+            </div>
+            <p className="section-desc">
+              La identidad visual de Bagpiper está basada en la figura del Dark Piper, un personaje inspirado en una antigua
+              leyenda sobre un misterioso gaitero de los bosques que conocía las propiedades de plantas y botánicos, y
+              elaboraba mezclas con hierbas, raíces, especias, flores y bayas. Esa herencia vive hoy en cada expresión de la
+              casa: en sus licores herbales y en sus gines.
+            </p>
+          </motion.div>
+
+          <div className="legend-grid">
+            {darkPiperSymbols.map((symbol) => (
+              <motion.article variants={fadeUp} key={symbol.name} className="legend-card">
+                <span className="legend-role">{symbol.role}</span>
+                <h3 className="legend-name">{symbol.name}</h3>
+                <p className="legend-text">{symbol.text}</p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      <section id="mundo" className="section film-section" aria-labelledby="mundo-title">
+        <motion.div className="container" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
+          <div className="section-header">
+            <span className="section-eyebrow">Visual Language</span>
+            <h2 id="mundo-title" className="section-title">
+              BAGPIPER <span className="text-outline">NIGHT MOOD</span>
+            </h2>
+            <p className="section-desc">
+              Del bar a la pista y de la terraza al jardín: Bagpiper Herbal Liqueur y Bagpiper London Dry Gin en su
+              ambiente, para consumo directo y coctelería.
+            </p>
+          </div>
+        </motion.div>
+        <FilmStrip rows={filmRows} />
+      </section>
+
+      <motion.section id="botanicos" className="section" {...inView}>
+        <div className="container">
+          <div className="botanicals-layout">
+            <motion.div variants={fadeUp} className="botanicals-img-panel botanicals-img-panel--studio">
+              <img
+                src={HERBAL_PACKSHOT_IMG}
+                alt="Nueva presentación de Bagpiper Herbal Liqueur: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
+                width={800}
+                height={1200}
+                loading="lazy"
+              />
+              <div className="botanicals-img-label">
+                <span className="section-eyebrow">Perfil Aromático</span>
+                <p className="botanicals-img-copy">Hierbas · Raíces · Especias · Enebro · Frutos del bosque</p>
+              </div>
+            </motion.div>
+
+            <div className="botanicals-content">
+              <motion.div variants={fadeUp} className="section-header" style={{ marginBottom: "2rem" }}>
+                <span className="section-eyebrow">Selección botánica</span>
+                <h2 className="section-title">
+                  ALMA
+                  <br />
+                  <span className="text-outline">BOTÁNICA</span>
+                </h2>
+                <p className="section-desc">
+                  Crafted with selected herbs &amp; botanicals. Hierbas, raíces y especias para el licor herbal; enebro,
+                  cítricos y frutos del bosque para el gin. Dos perfiles que nacen del mismo bosque.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="botanicals-tags">
+                {botanicals.map((botanical) => (
+                  <span key={botanical} className="botanical-tag">
+                    {botanical}
+                  </span>
+                ))}
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="regions-list">
+                {regions.map((region) => (
+                  <div key={region.name} className="region-item">
+                    <span className="region-name">{region.name}</span>
+                    <span className="region-role">{region.role}</span>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {faqSection(
+        <>
+          GIN &amp; <span className="text-outline">LICOR HERBAL</span>
+        </>,
+        "Todo sobre Bagpiper: una marca de gines y licores herbales desarrollada en Lamoille, Nevada, con receta, marca e identidad propias."
+      )}
+    </>
+  );
+
+  /* ---------- /herbal ---------- */
+
+  const herbalContent = (
+    <>
+      <section className="container product-hero" id="top">
+        {breadcrumb("Bagpiper Herbal Liqueur")}
+        <div className="product-hero-grid">
+          <div className="product-hero-copy">
+            <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
+              Expresión Herbal · Lamoille, Nevada
+            </span>
+            <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
+              BAGPIPER <span className="accent hero-title-sub">HERBAL LIQUEUR</span>
+            </h1>
+            <p className="section-desc hero-reveal" style={revealDelay(2)}>
+              {BRAND_STATEMENT} Bagpiper Herbal Liqueur es la receta original de la casa: un licor herbal oscuro y
+              envolvente de hierbas, raíces, especias y botánicos, ahora en su nueva presentación de botella verde
+              profundo. Se sirve muy frío, solo o en coctelería.
+            </p>
+            {specChips(["35% Vol.", "750 ml", "Serve Cold", "Original Recipe"])}
+            <div className="hero-actions hero-reveal" style={revealDelay(4)}>
+              <button type="button" className="btn btn-primary" onClick={() => openFicha("herbal")} aria-haspopup="dialog">
+                Ver ficha técnica
+              </button>
+              <a href="#cocteles" className="btn btn-outline">
+                Cócteles con Bagpiper Herbal
+              </a>
+            </div>
+          </div>
+          <div className="product-hero-visual product-hero-visual--studio hero-reveal" style={revealDelay(2)}>
+            <img
+              src={HERBAL_PACKSHOT_IMG}
+              alt="Botella de Bagpiper Herbal Liqueur, nueva presentación verde oscuro, 750 ml, 35% vol., etiqueta Smith & Johnson"
+              width={800}
+              height={1200}
+              {...HIGH_PRIORITY}
+            />
+          </div>
+        </div>
+      </section>
+
+      {profileSection(
+        "perfil",
+        "A secret blend of fine botanicals",
+        <>
+          EL PERFIL <span className="accent">HERBAL</span>
+        </>,
+        "Cuatro rasgos que la casa imprimió en la etiqueta de la nueva presentación y que definen a Bagpiper Herbal Liqueur.",
+        herbalProfile,
+        "herbal"
+      )}
+
+      <motion.section id="presentacion" className="section feature-section herbal-section" {...inView}>
+        <span className="feature-bgword" aria-hidden="true">
+          HERBAL
+        </span>
+        <div className="container">
+          <div className="gin-layout feature-layout--reverse">
+            <motion.div variants={fadeUp} className="gin-mosaic">
+              <img src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro, sobre barra nocturna" width={900} height={1200} loading="lazy" />
+              <img src={HERBAL_PARTY_IMG} alt="Bagpiper Herbal Liqueur y un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
+              <img src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser" width={1280} height={720} loading="lazy" />
+            </motion.div>
+            <div className="gin-content">
+              <motion.div variants={fadeUp} className="section-header gin-header">
+                <span className="section-eyebrow">Nueva presentación</span>
+                <h2 className="section-title">
+                  LA NOCHE <span className="text-outline">ES VERDE</span>
+                </h2>
+                <p className="section-desc">
+                  La nueva botella de Bagpiper Herbal Liqueur es verde profundo, con la etiqueta vintage de Smith &amp;
+                  Johnson Master Liquormakers y la figura del Dark Piper al centro. Hecha para la barra, la pista y el
+                  ritual del trago bien frío.
+                </p>
+              </motion.div>
+              <motion.div variants={fadeUp} className="gin-highlights">
+                {herbalHighlights.map((item) => (
+                  <div key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {cocktailsSection(
+        (id) => id === "herbal",
+        "Cócteles con licor herbal",
+        <>
+          CÓCTELES CON <span className="accent">BAGPIPER HERBAL</span>
+        </>,
+        "Dos recetas de la casa para Bagpiper Herbal Liqueur: el ritual frío con naranja y un tónico oscuro con romero."
+      )}
+
+      {faqSection(
+        <>
+          BAGPIPER <span className="text-outline">HERBAL LIQUEUR</span>
+        </>,
+        "Lo que más nos preguntan sobre el licor herbal de Bagpiper."
+      )}
+
+      {crossLink("gin")}
+    </>
+  );
+
+  /* ---------- /gin ---------- */
+
+  const ginContent = (
+    <>
+      <section className="container product-hero" id="top">
+        {breadcrumb("Bagpiper London Dry Gin")}
+        <div className="product-hero-grid">
+          <div className="product-hero-copy">
+            <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
+              Expresión Gin · Lamoille, Nevada
+            </span>
+            <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
+              BAGPIPER <span className="accent hero-title-sub hero-title-sub--gin">LONDON DRY GIN</span>
+            </h1>
+            <p className="section-desc hero-reveal" style={revealDelay(2)}>
+              {BRAND_STATEMENT} Bagpiper London Dry Gin es su expresión gin: vapour infused y destilado a partir de 100%
+              grano, en dos versiones con una misma firma. El Classic, seco y cítrico; el Black Pink, rosado y con frutos
+              del bosque.
+            </p>
+            {specChips(["40% Vol. · 80 Proof", "750 ml", "Vapour Infused", "100% Grano"])}
+            <div className="hero-actions hero-reveal" style={revealDelay(4)}>
+              <a href="#versiones" className="btn btn-primary">
+                Classic &amp; Black Pink
+              </a>
+              <a href="#cocteles" className="btn btn-outline">
+                Gin tonic Bagpiper
+              </a>
+            </div>
+          </div>
+          <div className="product-hero-visual product-hero-visual--duo hero-reveal" style={revealDelay(2)}>
+            <img
+              src={GIN.classicLondonDry}
+              alt="Bagpiper London Dry Gin Classic, botella transparente con copa balón de gin tonic"
+              width={654}
+              height={1086}
+              {...HIGH_PRIORITY}
+            />
+            <img
+              src={GIN.pinkBerries}
+              alt="Bagpiper London Dry Gin Black Pink, botella rosada con copa de frutos del bosque"
+              width={717}
+              height={1086}
+            />
+          </div>
+        </div>
+      </section>
+
+      <motion.section id="versiones" className="section" {...inView}>
+        <div className="container">
+          {sectionHeader(
+            "Dos versiones",
+            <>
+              CLASSIC <span className="accent">&amp; BLACK PINK</span>
+            </>,
+            "La misma base London Dry, dos caracteres. Abre la ficha de cada botella."
+          )}
+          <div className="expr-grid expr-grid--duo">
+            {ginExpressions.map((expr) => (
+              <motion.button
+                variants={fadeUp}
+                key={expr.id}
+                type="button"
+                className="expr-card"
+                style={accentStyle(expr.id)}
+                onClick={() => openFicha(expr.id)}
+                aria-haspopup="dialog"
+                aria-label={`Ver ficha de Bagpiper ${expr.name} ${expr.short}`}
+              >
+                <div className="expr-card-media">
+                  <img src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
+                  <span className="expr-card-family">{expr.familyLabel}</span>
+                </div>
+                <div className="expr-card-body">
+                  <span className="expr-card-tag">{expr.tag}</span>
+                  <h3 className="expr-card-title">
+                    Bagpiper {expr.name}
+                    <span>{expr.short}</span>
+                  </h3>
+                  <p className="expr-card-line">{expr.line}</p>
+                  <p className="expr-card-desc">{expr.description}</p>
+                  <div className="expr-card-specs">
+                    {expr.notes.map((note) => (
+                      <span key={note}>{note}</span>
+                    ))}
+                  </div>
+                  <span className="expr-card-cta">Ver ficha</span>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {profileSection(
+        "estilo",
+        "Vapour infused · Distilled from 100% grain spirit",
+        <>
+          EL ESTILO <span className="accent">LONDON DRY</span>
+        </>,
+        "Lo que dice la etiqueta de Bagpiper London Dry Gin, explicado.",
+        ginProfile,
+        "classic"
+      )}
+
+      <section className="section film-section" aria-labelledby="gin-mood-title">
+        <motion.div className="container" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
+          <div className="section-header">
+            <span className="section-eyebrow">En su ambiente</span>
+            <h2 id="gin-mood-title" className="section-title">
+              BAGPIPER <span className="text-outline">GIN MOOD</span>
+            </h2>
+          </div>
+        </motion.div>
+        <FilmStrip rows={[ginFilmRow]} />
+      </section>
+
+      {cocktailsSection(
+        (id) => id !== "herbal",
+        "Gin tonic Bagpiper",
+        <>
+          CÓCTELES CON <span className="accent">BAGPIPER GIN</span>
+        </>,
+        "Copa balón, hielo abundante y tónica fría: el gin tonic de cada versión."
+      )}
+
+      {faqSection(
+        <>
+          BAGPIPER <span className="text-outline">LONDON DRY GIN</span>
+        </>,
+        "Lo que más nos preguntan sobre el gin de Bagpiper."
+      )}
+
+      {crossLink("herbal")}
+    </>
+  );
+
   return (
     <>
       <a href="#main" className="skip-link">
@@ -264,12 +1188,7 @@ function App() {
 
       <AnimatePresence>
         {ageVerified === null && (
-          <motion.div
-            className="age-gate"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.6 } }}
-          >
+          <motion.div className="age-gate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.6 } }}>
             <motion.div
               className="age-gate-card"
               initial={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -277,7 +1196,7 @@ function App() {
             >
               <div className="age-gate-logo">BAGPIPER</div>
               <div className="age-gate-divider" />
-              <h2 className="age-gate-title">¿Eres mayor de 18 años?</h2>
+              <p className="age-gate-title">¿Eres mayor de 18 años?</p>
               <p className="age-gate-desc">
                 El consumo de alcohol es exclusivo para mayores de edad.
                 <br />
@@ -291,23 +1210,17 @@ function App() {
                   No, soy menor
                 </button>
               </div>
-              <p className="age-gate-legal">
-                Al ingresar confirmas que tienes la edad legal para consumir bebidas alcohólicas en tu país.
-              </p>
+              <p className="age-gate-legal">Al ingresar confirmas que tienes la edad legal para consumir bebidas alcohólicas en tu país.</p>
             </motion.div>
           </motion.div>
         )}
 
         {ageVerified === false && (
           <motion.div className="age-gate age-gate--denied" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <motion.div
-              className="age-gate-card"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1, transition: { delay: 0.1 } }}
-            >
+            <motion.div className="age-gate-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1, transition: { delay: 0.1 } }}>
               <div className="age-gate-logo">BAGPIPER</div>
               <div className="age-gate-divider" />
-              <h2 className="age-gate-title">Lo sentimos</h2>
+              <p className="age-gate-title">Lo sentimos</p>
               <p className="age-gate-desc">Debes ser mayor de edad para acceder a este sitio.</p>
             </motion.div>
           </motion.div>
@@ -318,14 +1231,14 @@ function App() {
       <div className="app-wrapper">
         <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
           <div className="container nav-container">
-            <a href="#top" className="nav-logo">
+            <a href="/" className="nav-logo" aria-label="Bagpiper, inicio">
               <span className="nav-logo-main">BAGPIPER</span>
               <span className="nav-logo-sub">Gin &amp; Herbal Liqueur</span>
             </a>
 
             <nav className="nav-links-desktop" aria-label="Principal">
               {navLinks.map((link) => (
-                <a key={link.label} href={link.href} className="nav-link">
+                <a key={link.label} href={link.href} className="nav-link" aria-current={link.href === currentPath ? "page" : undefined}>
                   {link.label}
                 </a>
               ))}
@@ -366,6 +1279,7 @@ function App() {
                     key={link.label}
                     href={link.href}
                     className="mobile-menu-link"
+                    aria-current={link.href === currentPath ? "page" : undefined}
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}
@@ -383,692 +1297,22 @@ function App() {
         )}
 
         <main id="main">
-          <motion.section className="container" id="top" initial="hidden" animate="visible" variants={staggerContainer}>
-            <div className="hero-bento">
-              <motion.div variants={fadeUp} className="bento-card bento-card-main">
-                <video
-                  ref={videoRef}
-                  className="bg-video"
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                  poster={HERO_POSTER}
-                  aria-hidden="true"
-                />
-                <div className="overlay" />
-                <div className="content">
-                  <span className="section-eyebrow">Lamoille, Nevada · USA · Smith &amp; Johnson &amp; Co.</span>
-                  <h1 className="hero-title">
-                    BAGPIPER <span className="accent hero-title-sub">HERBAL LIQUEUR &amp; LONDON DRY GIN</span>
-                  </h1>
-                  <p className="section-desc">
-                    {BRAND_STATEMENT} Dos expresiones, una misma leyenda: la receta herbal original y un London Dry
-                    Gin en versiones Classic y Black Pink.
-                  </p>
-                  <div className="hero-actions">
-                    <a href="#elige" className="btn btn-primary">
-                      Ver las expresiones
-                    </a>
-                    <a href="#contacto" className="btn btn-outline">
-                      Distribución
-                    </a>
-                  </div>
-                </div>
-                <div className="reel-nav" aria-label="Capítulos del video">
-                  {REEL_CHAPTERS.map((chapter, i) => (
-                    <button
-                      key={chapter.id}
-                      type="button"
-                      className={`reel-chapter reel-chapter--${chapter.id} ${reelChapter === i ? "is-active" : ""}`}
-                      onClick={() => seekReel(i)}
-                      aria-pressed={reelChapter === i}
-                    >
-                      <span className="reel-chapter-num">0{i + 1}</span>
-                      <span className="reel-chapter-text">
-                        <strong>{chapter.label}</strong>
-                        <span>{chapter.sub}</span>
-                      </span>
-                      <span className="reel-chapter-bar" aria-hidden="true">
-                        <span
-                          ref={(el) => {
-                            reelFillRefs.current[i] = el;
-                          }}
-                        />
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
+          {page === "home" && homeContent}
+          {page === "herbal" && herbalContent}
+          {page === "gin" && ginContent}
 
-              <div className="bento-side-cards">
-                <motion.div variants={fadeUp} className="bento-card bento-card-stat bento-card-mini-video">
-                  <div className="mood-rotator" aria-hidden="true">
-                    {moodSlides.map((slide, i) => (
-                      <img
-                        key={slide.src}
-                        src={slide.src}
-                        alt=""
-                        className={`mood-slide ${moodIndex === i ? "is-active" : ""}`}
-                      />
-                    ))}
-                  </div>
-                  <div className="side-video-overlay" />
-                  <div className="stat-content">
-                    <div className="stat-label">The Dark Piper</div>
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={moodIndex}
-                        className="stat-val stat-val-sm"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.35 }}
-                      >
-                        {moodSlides[moodIndex].label}
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-
-                <motion.div variants={fadeUp} className="bento-card bento-card-stat">
-                  <div className="stat-content stat-content-stack">
-                    {stats.map((stat) => (
-                      <div key={stat.value} className="stat-row">
-                        <div className="stat-label">{stat.title}</div>
-                        <div className="stat-val">{stat.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-
-                <motion.a
-                  variants={fadeUp}
-                  href="#expresiones"
-                  className="bento-card bento-card-stat bento-card-label"
-                  aria-label="Ver las expresiones de Bagpiper"
-                >
-                  <div className="spec-label">
-                    <p className="spec-label-eyebrow">The Expressions</p>
-                    <p className="spec-label-abv">02</p>
-                    <p className="spec-label-vol">Expresiones</p>
-                    <div className="spec-label-rule" />
-                    <div className="spec-label-row">
-                      <span>Herbal 35%</span>
-                      <span className="spec-label-serve">Gin 40%</span>
-                    </div>
-                  </div>
-                </motion.a>
-              </div>
-            </div>
-          </motion.section>
-
-          <div className="marquee-wrapper" aria-hidden="true">
-            <div className="marquee-content">
-              {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
-                <div key={`${item}-${index}`} className="marquee-item">
-                  <span>✦</span> {item}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <section id="elige" className="split-band" aria-labelledby="elige-title">
-            <motion.div
-              className="container split-band-head"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeUp}
-            >
-              <span className="section-eyebrow">Elige tu expresión</span>
-              <h2 id="elige-title" className="section-title">
-                DOS EXPRESIONES. <span className="accent">UNA LEYENDA.</span>
-              </h2>
-            </motion.div>
-
-            <div className="split-band-panels">
-              <a href="#herbal" className="split-panel" style={accentStyle("herbal")}>
-                <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur, nueva presentación, en la barra de una discoteca" />
-                <span className="split-panel-shade" aria-hidden="true" />
-                <span className="split-panel-content">
-                  <span className="split-panel-tag">01 · Expresión Herbal</span>
-                  <span className="split-panel-title">Herbal Liqueur</span>
-                  <span className="split-panel-line">Oscuro. Herbal. Bien frío.</span>
-                  <span className="split-panel-meta">35% Vol. · 750 ml · Serve Cold</span>
-                  <span className="split-panel-cta">Descubrir</span>
-                </span>
-              </a>
-              <a href="#gin" className="split-panel split-panel--gin" style={accentStyle("black-pink")}>
-                <ParallaxImg src={GIN.pinkGlass} alt="Bagpiper London Dry Gin Black Pink servido en copa balón con frutos del bosque" />
-                <span className="split-panel-shade" aria-hidden="true" />
-                <span className="split-panel-content">
-                  <span className="split-panel-tag">02 · Expresión Gin</span>
-                  <span className="split-panel-title">London Dry Gin</span>
-                  <span className="split-panel-line">Seco. Fresco. Botánico.</span>
-                  <span className="split-panel-meta">40% Vol. · Classic &amp; Black Pink</span>
-                  <span className="split-panel-cta">Descubrir</span>
-                </span>
-              </a>
-            </div>
-          </section>
-
-          <motion.section
-            id="herbal"
-            className="section feature-section herbal-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <span className="feature-bgword" aria-hidden="true">
-              HERBAL
-            </span>
+          <motion.section id="contacto" className="section ig-section" {...inView}>
             <div className="container">
-              <div className="gin-layout feature-layout--reverse">
-                <motion.div variants={fadeUp} className="gin-mosaic">
-                  <img
-                    src={HERBAL_VERTICAL_IMG}
-                    alt="Bagpiper Herbal Liqueur, botella verde oscuro de la nueva presentación, sobre barra nocturna"
-                    width={900}
-                    height={1200}
-                    loading="lazy"
-                  />
-                  <img
-                    src={HERBAL_LASERS_IMG}
-                    alt="Botella de Bagpiper Herbal Liqueur bajo luces láser en una discoteca"
-                    width={1280}
-                    height={720}
-                    loading="lazy"
-                  />
-                  <img
-                    src={CLUB_IMG}
-                    alt="Bagpiper Herbal Liqueur en la barra de una fiesta"
-                    width={1280}
-                    height={720}
-                    loading="lazy"
-                  />
-                </motion.div>
-
-                <div className="gin-content">
-                  <motion.div variants={fadeUp} className="section-header gin-header">
-                    <span className="section-eyebrow">Expresión Herbal</span>
-                    <h2 className="section-title">
-                      BAGPIPER <span className="text-outline">HERBAL LIQUEUR</span>
-                    </h2>
-                    <p className="section-desc">
-                      La receta original de la casa, desarrollada en Lamoille, Nevada: un licor herbal oscuro y
-                      envolvente de hierbas, raíces, especias y botánicos. Nueva presentación en botella verde profundo.
-                      Se sirve muy frío, solo o en coctelería.
-                    </p>
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="gin-highlights">
-                    {herbalHighlights.map((item) => (
-                      <div key={item.label}>
-                        <span>{item.label}</span>
-                        <strong>{item.value}</strong>
-                      </div>
-                    ))}
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="gin-variants">
-                    <button
-                      type="button"
-                      className="gin-variant"
-                      style={accentStyle("herbal")}
-                      onClick={() => openFicha("herbal")}
-                      aria-haspopup="dialog"
-                    >
-                      <span className="gin-variant-dot" aria-hidden="true" />
-                      <span className="gin-variant-text">
-                        <strong>Original Recipe</strong>
-                        <span>Hierbas · Raíces · Especias · Serve Cold</span>
-                      </span>
-                      <span className="gin-variant-cta">Ficha</span>
-                    </button>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="gin"
-            className="section feature-section gin-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <span className="feature-bgword" aria-hidden="true">
-              GIN
-            </span>
-            <div className="container">
-              <div className="gin-layout">
-                <motion.div variants={fadeUp} className="gin-mosaic">
-                  <img
-                    src={GIN.classicBar}
-                    alt="Bagpiper London Dry Gin Classic con copa de gin tonic en un bar nocturno"
-                    width={718}
-                    height={1086}
-                    loading="lazy"
-                  />
-                  <img
-                    src={GIN.classicTonic}
-                    alt="Bagpiper London Dry Gin Classic y copa balón con hielo"
-                    width={1023}
-                    height={701}
-                    loading="lazy"
-                  />
-                  <img
-                    src={GIN.pinkGarden}
-                    alt="Bagpiper London Dry Gin Black Pink con frutos del bosque en un jardín"
-                    width={1023}
-                    height={729}
-                    loading="lazy"
-                  />
-                </motion.div>
-
-                <div className="gin-content">
-                  <motion.div variants={fadeUp} className="section-header gin-header">
-                    <span className="section-eyebrow">Expresión Gin</span>
-                    <h2 className="section-title">
-                      BAGPIPER <span className="text-outline">LONDON DRY GIN</span>
-                    </h2>
-                    <p className="section-desc">
-                      Desarrollada en Lamoille, Nevada, la expresión gin de Bagpiper es un London Dry infusionado al
-                      vapor y destilado a partir de 100% grano. Dos versiones, una misma firma: el Classic, seco y
-                      cítrico, y el Black Pink, con frutos del bosque.
-                    </p>
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="gin-highlights">
-                    {ginHighlights.map((item) => (
-                      <div key={item.label}>
-                        <span>{item.label}</span>
-                        <strong>{item.value}</strong>
-                      </div>
-                    ))}
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="gin-variants">
-                    {ginExpressions.map((expr) => (
-                      <button
-                        key={expr.id}
-                        type="button"
-                        className="gin-variant"
-                        style={accentStyle(expr.id)}
-                        onClick={() => openFicha(expr.id)}
-                        aria-haspopup="dialog"
-                      >
-                        <span className="gin-variant-dot" aria-hidden="true" />
-                        <span className="gin-variant-text">
-                          <strong>{expr.short}</strong>
-                          <span>{expr.notes.slice(0, 3).join(" · ")}</span>
-                        </span>
-                        <span className="gin-variant-cta">Ficha</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="expresiones"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="section-header section-header-center">
-                <span className="section-eyebrow">La colección</span>
-                <h2 className="section-title">
-                  LA COLECCIÓN <span className="accent">BAGPIPER</span>
-                </h2>
-                <p className="section-desc">
-                  {BRAND_STATEMENT} Herbal Liqueur y London Dry Gin en versiones Classic y Black Pink: abre la ficha de
-                  cada botella.
-                </p>
-              </motion.div>
-
-              <div className="expr-grid">
-                {expressions.map((expr) => (
-                  <motion.button
-                    variants={fadeUp}
-                    key={expr.id}
-                    type="button"
-                    className={`expr-card ${expr.studio ? "expr-card--studio" : ""}`}
-                    style={accentStyle(expr.id)}
-                    onClick={() => openFicha(expr.id)}
-                    aria-haspopup="dialog"
-                    aria-label={`Ver ficha de Bagpiper ${expr.name} ${expr.short}`}
-                  >
-                    <div className="expr-card-media">
-                      <img
-                        src={expr.image}
-                        alt={expr.imageAlt}
-                        width={expr.imageWidth}
-                        height={expr.imageHeight}
-                        loading="lazy"
-                      />
-                      <span className="expr-card-family">{expr.familyLabel}</span>
-                    </div>
-                    <div className="expr-card-body">
-                      <span className="expr-card-tag">{expr.tag}</span>
-                      <h3 className="expr-card-title">
-                        {expr.name}
-                        <span>{expr.short}</span>
-                      </h3>
-                      <p className="expr-card-line">{expr.line}</p>
-                      <div className="expr-card-specs">
-                        <span>{expr.abv}</span>
-                        <span>{expr.volume}</span>
-                        <span>{expr.serve}</span>
-                      </div>
-                      <span className="expr-card-cta">Ver ficha</span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="cocteles"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="section-header section-header-center">
-                <span className="section-eyebrow">Cócteles de la casa</span>
-                <h2 className="section-title">
-                  CÓMO SE TOMA <span className="accent">BAGPIPER</span>
-                </h2>
-                <p className="section-desc">
-                  Frío y directo para el licor herbal; en copa balón con tónica para el gin. Cuatro recetas de la casa,
-                  dos por expresión.
-                </p>
-              </motion.div>
-
-              <div className="cocktail-grid">
-                {cocktails.map((c) => (
-                  <motion.article variants={fadeUp} key={c.id} className="cocktail-card" style={accentStyle(c.expressionId)}>
-                    <div className="cocktail-media">
-                      <img
-                        src={c.image}
-                        alt={c.imageAlt}
-                        width={c.imageWidth}
-                        height={c.imageHeight}
-                        loading="lazy"
-                        style={c.imagePosition ? { objectPosition: c.imagePosition } : undefined}
-                      />
-                      <span className="cocktail-glass">{c.glass}</span>
-                    </div>
-                    <div className="cocktail-body">
-                      <span className="cocktail-expression">{c.expression}</span>
-                      <h3 className="cocktail-name">{c.name}</h3>
-                      <p className="cocktail-tagline">{c.tagline}</p>
-                      <ul className="cocktail-ingredients">
-                        {c.ingredients.map((ing) => (
-                          <li key={ing}>{ing}</li>
-                        ))}
-                      </ul>
-                      <ol className="cocktail-steps">
-                        {c.steps.map((step) => (
-                          <li key={step}>{step}</li>
-                        ))}
-                      </ol>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="historia"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="section-header section-header-center">
-                <span className="section-eyebrow">Sobre Nosotros</span>
-                <h2 className="section-title">
-                  DESARROLLADO EN USA <span className="accent">LAMOILLE, NEVADA</span>
-                </h2>
-                <p className="section-desc">
-                  {BRAND_STATEMENT} Creada en 2018 por Smith &amp; Johnson &amp; Co., compañía dedicada al
-                  desarrollo y comercialización de bebidas espirituosas, y reintroducida internacionalmente en 2024.
-                </p>
-              </motion.div>
-
-              <div className="heritage-layout">
-                <motion.div variants={fadeUp} className="timeline">
-                  {timeline.slice(0, 2).map((item) => (
-                    <article key={item.year} className="timeline-item">
-                      <span className="timeline-year">{item.year}</span>
-                      <h3 className="timeline-title">{item.title}</h3>
-                      <p className="timeline-text">{item.text}</p>
-                    </article>
-                  ))}
-                </motion.div>
-
-                <motion.div variants={fadeUp} className="heritage-img-wrapper">
-                  <img
-                    src={HERBAL_PARTY_IMG}
-                    alt="Nueva presentación de Bagpiper Herbal Liqueur junto a un trago con naranja en una fiesta"
-                    width={540}
-                    height={720}
-                    loading="lazy"
-                  />
-                </motion.div>
-
-                <motion.div variants={fadeUp} className="timeline">
-                  {timeline.slice(2).map((item) => (
-                    <article key={item.year} className="timeline-item">
-                      <span className="timeline-year">{item.year}</span>
-                      <h3 className="timeline-title">{item.title}</h3>
-                      <p className="timeline-text">{item.text}</p>
-                    </article>
-                  ))}
-                </motion.div>
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="leyenda"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="legend-intro">
-                <div>
-                  <span className="section-eyebrow">La identidad</span>
-                  <h2 className="section-title">
-                    EL <span className="text-outline">DARK PIPER</span>
-                  </h2>
-                </div>
-                <p className="section-desc">
-                  La identidad visual de Bagpiper está basada en la figura del Dark Piper, un personaje inspirado en
-                  una antigua leyenda sobre un misterioso gaitero de los bosques que conocía las propiedades de
-                  plantas y botánicos, y elaboraba mezclas con hierbas, raíces, especias, flores y bayas. Esa
-                  herencia vive hoy en cada expresión de la casa: en sus licores herbales y en sus gines.
-                </p>
-              </motion.div>
-
-              <div className="legend-grid">
-                {darkPiperSymbols.map((symbol) => (
-                  <motion.article variants={fadeUp} key={symbol.name} className="legend-card">
-                    <span className="legend-role">{symbol.role}</span>
-                    <h3 className="legend-name">{symbol.name}</h3>
-                    <p className="legend-text">{symbol.text}</p>
-                  </motion.article>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-
-          <section id="mundo" className="section film-section" aria-labelledby="mundo-title">
-            <motion.div
-              className="container"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeUp}
-            >
-              <div className="section-header">
-                <span className="section-eyebrow">Visual Language</span>
-                <h2 id="mundo-title" className="section-title">
-                  BAGPIPER <span className="text-outline">NIGHT MOOD</span>
-                </h2>
-                <p className="section-desc">
-                  Del bar a la pista y de la terraza al jardín: Bagpiper Herbal Liqueur y Bagpiper London Dry Gin en
-                  su ambiente, para consumo directo y coctelería.
-                </p>
-              </div>
-            </motion.div>
-
-            <div className="film-strip">
-              {filmRows.map((row, r) => (
-                <div key={r} className={`film-row ${r % 2 ? "film-row--reverse" : ""}`}>
-                  {/* La fila se duplica para que el desplazamiento sea continuo; la copia queda oculta a lectores de pantalla. */}
-                  {[...row, ...row].map((item, i) => (
-                    <figure key={`${item.src}-${i}`} className="film-item" aria-hidden={i >= row.length}>
-                      <img src={item.src} alt={i >= row.length ? "" : item.alt} loading="lazy" />
-                      <figcaption>{item.label}</figcaption>
-                    </figure>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <motion.section
-            id="botanicos"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <div className="botanicals-layout">
-                <motion.div variants={fadeUp} className="botanicals-img-panel botanicals-img-panel--studio">
-                  <img
-                    src={HERBAL_PACKSHOT_IMG}
-                    alt="Nueva presentación de Bagpiper Herbal Liqueur: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
-                    width={800}
-                    height={1200}
-                    loading="lazy"
-                  />
-                  <div className="botanicals-img-label">
-                    <span className="section-eyebrow">Perfil Aromático</span>
-                    <p className="botanicals-img-copy">Hierbas · Raíces · Especias · Enebro · Frutos del bosque</p>
-                  </div>
-                </motion.div>
-
-                <div className="botanicals-content">
-                  <motion.div variants={fadeUp} className="section-header" style={{ marginBottom: "2rem" }}>
-                    <span className="section-eyebrow">Selección botánica</span>
-                    <h2 className="section-title">
-                      ALMA
-                      <br />
-                      <span className="text-outline">BOTÁNICA</span>
-                    </h2>
-                    <p className="section-desc">
-                      Crafted with selected herbs &amp; botanicals. Hierbas, raíces y especias para el licor herbal;
-                      enebro, cítricos y frutos del bosque para el gin. Dos perfiles que nacen del mismo bosque.
-                    </p>
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="botanicals-tags">
-                    {botanicals.map((botanical) => (
-                      <span key={botanical} className="botanical-tag">
-                        {botanical}
-                      </span>
-                    ))}
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="regions-list">
-                    {regions.map((region) => (
-                      <div key={region.name} className="region-item">
-                        <span className="region-name">{region.name}</span>
-                        <span className="region-role">{region.role}</span>
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="faq"
-            className="section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="section-header section-header-center">
-                <span className="section-eyebrow">Preguntas frecuentes</span>
-                <h2 className="section-title">
-                  GIN &amp; <span className="text-outline">LICOR HERBAL</span>
-                </h2>
-                <p className="section-desc contact-lead">
-                  Todo sobre Bagpiper: una marca de gines y licores herbales desarrollada en Lamoille, Nevada, con
-                  receta, marca e identidad propias.
-                </p>
-              </motion.div>
-
-              <div className="faq-list">
-                {faqs.map((item) => (
-                  <motion.div variants={fadeUp} key={item.q}>
-                    <details className="faq-item">
-                      <summary>{item.q}</summary>
-                      <p>{item.a}</p>
-                    </details>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section
-            id="contacto"
-            className="section ig-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="container">
-              <motion.div variants={fadeUp} className="section-header section-header-center">
-                <span className="section-eyebrow">Latinoamérica</span>
-                <h2 className="section-title">
+              {sectionHeader(
+                "Latinoamérica",
+                <>
                   NUEVA <span className="text-outline">ETAPA</span>
-                </h2>
-                <p className="section-desc contact-lead">
-                  {BRAND_STATEMENT} A partir de 2024 trabaja con importadores y distribuidores de bebidas espirituosas
-                  en Latinoamérica, posicionando sus gines y licores herbales para consumo directo y coctelería.
-                </p>
-              </motion.div>
+                </>,
+                <>
+                  {BRAND_STATEMENT} A partir de 2024 trabaja con importadores y distribuidores de bebidas espirituosas en
+                  Latinoamérica, posicionando sus gines y licores herbales para consumo directo y coctelería.
+                </>
+              )}
 
               <motion.div variants={fadeUp} className="contact-panel">
                 <img
@@ -1083,8 +1327,8 @@ function App() {
                   <p className="section-eyebrow">Distribución</p>
                   <h3>Presencia progresiva en la región</h3>
                   <p>
-                    Modernización de la presentación, un portafolio de gin y licor herbal, y expansión hacia
-                    mercados internacionales. Próximamente, nuevas alianzas comerciales en la región.
+                    Modernización de la presentación, un portafolio de gin y licor herbal, y expansión hacia mercados
+                    internacionales. Próximamente, nuevas alianzas comerciales en la región.
                   </p>
                   <div className="btn btn-outline" style={{ cursor: "default" }}>
                     Coming Soon
@@ -1096,6 +1340,14 @@ function App() {
         </main>
 
         <footer className="footer">
+          <nav className="container footer-nav" aria-label="Pie de página">
+            <a href="/">Inicio</a>
+            <a href="/herbal">Bagpiper Herbal Liqueur</a>
+            <a href="/gin">Bagpiper London Dry Gin</a>
+            <a href="/#cocteles">Cócteles</a>
+            <a href="/#historia">Historia</a>
+            <a href="#contacto">Contacto</a>
+          </nav>
           <div className="container">
             <div>© {new Date().getFullYear()} BAGPIPER · SMITH &amp; JOHNSON &amp; CO.</div>
             <div className="footer-tag">Gines &amp; Licores Herbales · Lamoille, Nevada · USA</div>
@@ -1106,13 +1358,7 @@ function App() {
 
       <AnimatePresence>
         {ficha && (
-          <motion.div
-            className="ficha-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeFicha}
-          >
+          <motion.div className="ficha-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeFicha}>
             <motion.div
               id="ficha-bagpiper"
               className="ficha-card"
@@ -1170,13 +1416,7 @@ function App() {
                   {expressions
                     .filter((e) => e.id !== ficha.id)
                     .map((e) => (
-                      <button
-                        key={e.id}
-                        type="button"
-                        className="ficha-switch-btn"
-                        style={accentStyle(e.id)}
-                        onClick={() => openFicha(e.id)}
-                      >
+                      <button key={e.id} type="button" className="ficha-switch-btn" style={accentStyle(e.id)} onClick={() => openFicha(e.id)}>
                         {e.familyLabel} · {e.short}
                       </button>
                     ))}

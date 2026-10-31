@@ -1,23 +1,7 @@
-﻿User-agent: *
+# robots.txt — https://bagpiper.site
+# Todo el sitio es público e indexable (incluye buscadores y asistentes de IA).
+User-agent: *
 Allow: /
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
+Disallow: /404
 
 Sitemap: https://bagpiper.site/sitemap.xml
-Host: https://bagpiper.site

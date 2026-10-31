@@ -2,14 +2,15 @@ export const BRAND_STATEMENT =
   "Bagpiper es una línea de licores herbales y gines de alta calidad desarrollada en Estados Unidos — Lamoille, Nevada.";
 
 export const navLinks = [
-  { label: "Expresiones", href: "#elige" },
-  { label: "Herbal", href: "#herbal" },
-  { label: "Gin", href: "#gin" },
-  { label: "Colección", href: "#expresiones" },
-  { label: "Cócteles", href: "#cocteles" },
-  { label: "Historia", href: "#historia" },
-  { label: "Galería", href: "#mundo" },
-  { label: "FAQ", href: "#faq" },
+  // Rutas absolutas: el menú funciona igual desde la portada y desde /herbal o /gin.
+  { label: "Expresiones", href: "/#elige" },
+  { label: "Herbal", href: "/herbal" },
+  { label: "Gin", href: "/gin" },
+  { label: "Colección", href: "/#expresiones" },
+  { label: "Cócteles", href: "/#cocteles" },
+  { label: "Historia", href: "/#historia" },
+  { label: "Galería", href: "/#mundo" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export const stats = [
@@ -312,33 +313,112 @@ export const cocktails: Cocktail[] = [
   },
 ];
 
-export const faqs = [
+export type Page = "home" | "herbal" | "gin";
+
+// Atributos tomados de la etiqueta de la nueva presentación ("A secret blend of fine botanicals").
+export const herbalProfile = [
+  {
+    title: "Hierbas naturales",
+    label: "Natural Herbs",
+    text: "Una base de hierbas, raíces y especias seleccionadas que define el carácter oscuro de la receta.",
+  },
+  {
+    title: "Suave y equilibrado",
+    label: "Smooth & Balanced",
+    text: "Intenso en aroma y redondo en boca, pensado para tomarse solo y muy frío.",
+  },
+  {
+    title: "Nacido de la tradición",
+    label: "Born from Tradition",
+    text: "Inspirado en la leyenda del Dark Piper, el gaitero que mezclaba los botánicos del bosque.",
+  },
+  {
+    title: "Mezcla secreta",
+    label: "A Secret Blend",
+    text: "Una mezcla secreta de botánicos finos que la casa no revela: crafted with selected herbs & botanicals.",
+  },
+];
+
+// Atributos tomados de la etiqueta del gin ("Vapour infused · Distilled from 100% grain spirit").
+export const ginProfile = [
+  {
+    title: "Vapour Infused",
+    label: "Proceso",
+    text: "Los botánicos aromatizan el destilado a través del vapor, para un perfil limpio y fragante.",
+  },
+  {
+    title: "London Dry",
+    label: "Estilo",
+    text: "Seco y directo, con el enebro como columna y un final fresco.",
+  },
+  {
+    title: "100% Grano",
+    label: "Base",
+    text: "Destilado a partir de 100% grain spirit, una base neutra que deja hablar a los botánicos.",
+  },
+  {
+    title: "40% Vol. · 80 Proof",
+    label: "Graduación",
+    text: "La graduación clásica del gin, ideal para el gin tonic en copa balón.",
+  },
+];
+
+export type Faq = { q: string; a: string; pages: Page[] };
+
+export const faqs: Faq[] = [
   {
     q: "¿Qué es Bagpiper?",
     a: "Bagpiper es una línea de licores herbales y gines de alta calidad desarrollada en Estados Unidos — Lamoille, Nevada — por Smith & Johnson & Co. Hoy reúne dos expresiones: Herbal Liqueur y London Dry Gin, este último en versiones Classic y Black Pink. Sitio oficial: bagpiper.site.",
+    pages: ["home"],
   },
   {
     q: "¿Qué expresiones tiene Bagpiper?",
     a: "Dos expresiones: Bagpiper Herbal Liqueur (licor herbal, 35% vol., 750 ml) y Bagpiper London Dry Gin (40% vol., 750 ml), que se presenta en dos versiones: Classic y Black Pink, con frutos del bosque.",
+    pages: ["home"],
+  },
+  {
+    q: "¿Qué es Bagpiper Herbal Liqueur?",
+    a: "Es el licor herbal de Bagpiper: una receta original de hierbas, raíces, especias y botánicos, desarrollada en Lamoille, Nevada. 35% vol., botella de 750 ml en su nueva presentación verde oscuro. Se sirve muy frío.",
+    pages: ["herbal"],
   },
   {
     q: "¿Cómo se toma el licor herbal Bagpiper?",
     a: "Serve cold. Se sirve muy frío, solo o en copa helada, con hielo y piel de naranja, y también en coctelería.",
+    pages: ["home", "herbal"],
+  },
+  {
+    q: "¿Qué cócteles se preparan con Bagpiper Herbal Liqueur?",
+    a: "Los dos cócteles de la casa son Herbal Orange (licor herbal muy frío con hielo y naranja) y Dark Piper Tonic (licor herbal con tónica, limón y romero).",
+    pages: ["herbal"],
+  },
+  {
+    q: "¿Qué es Bagpiper London Dry Gin?",
+    a: "Es el gin de Bagpiper: un London Dry vapour infused, destilado a partir de 100% grano, con 40% vol. (80 proof) en botella de 750 ml. Se presenta en dos versiones: Classic y Black Pink.",
+    pages: ["gin"],
+  },
+  {
+    q: "¿Qué diferencia hay entre Bagpiper Classic y Black Pink?",
+    a: "El Classic es el London Dry tradicional, seco y cítrico, con el enebro al frente. El Black Pink es la versión rosada, con frutos del bosque —frambuesa, mora y arándano— sobre la misma base de enebro.",
+    pages: ["gin"],
   },
   {
     q: "¿Cómo se toma el gin Bagpiper?",
     a: "En gin tonic: copa balón con abundante hielo, una medida de gin y tónica fría. El Classic va con piel de limón; el Black Pink con frambuesas, moras y arándanos.",
+    pages: ["home", "gin"],
   },
   {
     q: "¿Qué cócteles se preparan con Bagpiper?",
     a: "Con el licor herbal: Herbal Orange (frío, con hielo y naranja) y Dark Piper Tonic (con tónica, limón y romero). Con el gin: Piper Classic Tonic (London Dry Classic, tónica y piel de limón) y Black Pink Berry Tonic (Black Pink, tónica y frutos del bosque).",
+    pages: ["home"],
   },
   {
     q: "¿De dónde es Bagpiper?",
     a: "Bagpiper fue desarrollada en Estados Unidos, en Lamoille, Nevada, por Smith & Johnson & Co. Desde 2024 se distribuye en Latinoamérica.",
+    pages: ["home", "herbal", "gin"],
   },
   {
     q: "¿Dónde se consigue Bagpiper?",
     a: "Desde 2024 Bagpiper trabaja con importadores y distribuidores de bebidas espirituosas en Latinoamérica. La presencia comercial de sus gines y licores herbales se desarrolla de forma progresiva en la región.",
+    pages: ["home", "herbal", "gin"],
   },
 ];
