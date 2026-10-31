@@ -3,35 +3,35 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
-    <loc>https://bagpiper.site/</loc>
+    <loc>https://www.bagpiper.site/</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-og.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-og.jpg</image:loc>
       <image:title>Bagpiper — Herbal Liqueur &amp; London Dry Gin</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-nightclub.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-nightclub.jpg</image:loc>
       <image:title>Bagpiper Herbal Liqueur — Night Sessions</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-copa.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-black-pink-copa.jpg</image:loc>
       <image:title>Bagpiper London Dry Gin Black Pink en copa</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-bar.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-classic-bar.jpg</image:loc>
       <image:title>Bagpiper London Dry Gin Classic — Bar</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-logo.png</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-logo.png</image:loc>
       <image:title>Logo Bagpiper</image:title>
     </image:image>
     <video:video>
-      <video:thumbnail_loc>https://bagpiper.site/images/bagpiper-hero-poster.jpg</video:thumbnail_loc>
+      <video:thumbnail_loc>https://www.bagpiper.site/images/bagpiper-hero-poster.jpg</video:thumbnail_loc>
       <video:title>Bagpiper — Herbal Liqueur &amp; London Dry Gin</video:title>
       <video:description>Reel oficial de Bagpiper: Herbal Liqueur en su nueva presentación y London Dry Gin Classic y Black Pink. Desarrollado en Lamoille, Nevada.</video:description>
-      <video:content_loc>https://bagpiper.site/images/bagpiper-reel.mp4</video:content_loc>
+      <video:content_loc>https://www.bagpiper.site/images/bagpiper-reel.mp4</video:content_loc>
       <video:duration>20</video:duration>
       <video:publication_date>2026-10-31T00:00:00+00:00</video:publication_date>
       <video:family_friendly>no</video:family_friendly>
@@ -39,62 +39,62 @@
     </video:video>
   </url>
   <url>
-    <loc>https://bagpiper.site/herbal</loc>
+    <loc>https://www.bagpiper.site/herbal</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-herbal-packshot.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-herbal-packshot.jpg</image:loc>
       <image:title>Bagpiper Herbal Liqueur — Nueva presentación 750 ml</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-herbal-vertical.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-herbal-vertical.jpg</image:loc>
       <image:title>Bagpiper Herbal Liqueur — Botella verde</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-herbal-ritual.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-herbal-ritual.jpg</image:loc>
       <image:title>Cóctel Herbal Orange con Bagpiper Herbal Liqueur</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-herbal-tonic.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-herbal-tonic.jpg</image:loc>
       <image:title>Cóctel Dark Piper Tonic con Bagpiper Herbal Liqueur</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-herbal-og.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-herbal-og.jpg</image:loc>
       <image:title>Bagpiper Herbal Liqueur</image:title>
     </image:image>
   </url>
   <url>
-    <loc>https://bagpiper.site/gin</loc>
+    <loc>https://www.bagpiper.site/gin</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-london-dry.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-classic-london-dry.jpg</image:loc>
       <image:title>Bagpiper London Dry Gin Classic</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-fruta-del-bosque.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-black-pink-fruta-del-bosque.jpg</image:loc>
       <image:title>Bagpiper London Dry Gin Black Pink — Fruta del bosque</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-limon.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-classic-limon.jpg</image:loc>
       <image:title>Piper Classic Tonic — gin tonic Bagpiper con limón</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-verano.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-black-pink-verano.jpg</image:loc>
       <image:title>Black Pink Berry Tonic — gin tonic rosado Bagpiper</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-black-pink-jardin.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-black-pink-jardin.jpg</image:loc>
       <image:title>Bagpiper Black Pink Gin — Jardín</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-classic-gin-tonic.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-classic-gin-tonic.jpg</image:loc>
       <image:title>Bagpiper Classic Gin Tonic</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://bagpiper.site/images/bagpiper-gin-og.jpg</image:loc>
+      <image:loc>https://www.bagpiper.site/images/bagpiper-gin-og.jpg</image:loc>
       <image:title>Bagpiper London Dry Gin Classic y Black Pink</image:title>
     </image:image>
   </url>

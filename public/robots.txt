@@ -1,7 +1,7 @@
-# robots.txt — https://bagpiper.site
+# robots.txt — https://www.bagpiper.site
 # Todo el sitio es público e indexable (incluye buscadores y asistentes de IA).
 User-agent: *
 Allow: /
 Disallow: /404
 
-Sitemap: https://bagpiper.site/sitemap.xml
+Sitemap: https://www.bagpiper.site/sitemap.xml

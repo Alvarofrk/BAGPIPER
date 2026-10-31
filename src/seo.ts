@@ -2,7 +2,8 @@
 // así el JSON-LD siempre describe exactamente lo que la página muestra.
 import { BRAND_STATEMENT, cocktails, expressions, faqs, type Page } from "./data/content";
 
-export const SITE = "https://bagpiper.site";
+// Dominio canónico: el que Vercel sirve como principal (bagpiper.site redirige a www).
+export const SITE = "https://www.bagpiper.site";
 
 type PageMeta = {
   path: string;
