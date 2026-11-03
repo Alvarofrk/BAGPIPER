@@ -21,6 +21,8 @@ export default defineConfig(({ isSsrBuild }) => ({
             main: page("./index.html"),
             herbal: page("./herbal.html"),
             gin: page("./gin.html"),
+            // También sirve de plantilla para /cocteles/<receta> (scripts/prerender.mjs).
+            cocteles: page("./cocteles.html"),
           },
           output: {
             manualChunks: (id: string) => {

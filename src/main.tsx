@@ -6,9 +6,10 @@ import "./styles/global.css";
 
 const container = document.getElementById("app")!;
 const page = (container.dataset.page as Page | undefined) ?? "home";
+const cocktailId = container.dataset.cocktail;
 const app = (
   <React.StrictMode>
-    <App page={page} />
+    <App page={page} cocktailId={cocktailId} />
   </React.StrictMode>
 );
 

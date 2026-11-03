@@ -5,7 +5,12 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [{ "source": "/index", "destination": "/", "permanent": true }],
+  "redirects": [
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/sitemap", "destination": "/sitemap.xml", "permanent": true },
+    { "source": "/sitemaps.xml", "destination": "/sitemap.xml", "permanent": true },
+    { "source": "/sitemap_index.xml", "destination": "/sitemap.xml", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

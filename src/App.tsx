@@ -25,6 +25,8 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
+import Picture, { imageSize, webpSrcSet } from "./components/Picture";
+import { HERO_IMAGE_SIZES } from "./data/lcp";
 
 const HERBAL_PACKSHOT_IMG = "/images/bagpiper-herbal-packshot.jpg";
 const HERBAL_VERTICAL_IMG = "/images/bagpiper-herbal-vertical.jpg";
@@ -105,14 +107,28 @@ const HIGH_PRIORITY = { fetchpriority: "high" } as Record<string, string>;
 // Retraso escalonado para las animaciones CSS de entrada (no dependen de JS: el texto del hero se pinta sin hidratar).
 const revealDelay = (i: number) => ({ animationDelay: `${0.1 * i}s` }) as CSSProperties;
 
+// Anchos mostrados por tipo de bloque, para que el navegador elija la variante WebP de 640 px en móvil.
+const SIZES = {
+  half: "(min-width: 900px) 50vw, 100vw",
+  third: "(min-width: 980px) 33vw, (min-width: 640px) 50vw, 100vw",
+  quarter: "(min-width: 1200px) 25vw, (min-width: 640px) 50vw, 100vw",
+  mosaic: "(min-width: 900px) 30vw, 50vw",
+  film: "(min-width: 900px) 28vw, 70vw",
+};
+
 function ParallaxImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["-8%", "8%"]);
+  const size = imageSize(src);
+  const srcSet = webpSrcSet(src);
   return (
     <div ref={ref} className={`parallax ${className ?? ""}`}>
-      <motion.img src={src} alt={alt} style={{ y }} loading="lazy" />
+      <picture>
+        {srcSet && <source type="image/webp" srcSet={srcSet} sizes={SIZES.half} />}
+        <motion.img src={src} alt={alt} width={size?.w} height={size?.h} style={{ y }} loading="lazy" decoding="async" />
+      </picture>
     </div>
   );
 }
@@ -125,7 +141,7 @@ function FilmStrip({ rows }: { rows: FilmItem[][] }) {
           {/* La fila se duplica para que el desplazamiento sea continuo; la copia queda oculta a lectores de pantalla. */}
           {[...row, ...row].map((item, i) => (
             <figure key={`${item.src}-${i}`} className="film-item" aria-hidden={i >= row.length}>
-              <img src={item.src} alt={i >= row.length ? "" : item.alt} loading="lazy" />
+              <Picture src={item.src} alt={i >= row.length ? "" : item.alt} loading="lazy" sizes={SIZES.film} />
               <figcaption>{item.label}</figcaption>
             </figure>
           ))}
@@ -135,7 +151,7 @@ function FilmStrip({ rows }: { rows: FilmItem[][] }) {
   );
 }
 
-function App({ page }: { page: Page }) {
+function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // Arranca en null también en el cliente para que la hidratación coincida con el HTML prerenderizado;
@@ -316,7 +332,11 @@ function App({ page }: { page: Page }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [ficha]);
 
-  const currentPath = page === "home" ? "/" : `/${page}`;
+  const cocktail = page === "cocktail" ? cocktails.find((c) => c.id === cocktailId) : undefined;
+  const currentPath = page === "home" ? "/" : page === "cocktail" ? `/cocteles/${cocktailId}` : `/${page}`;
+  // "Cócteles" queda activo también dentro de /cocteles/<receta>.
+  const isCurrent = (href: string) => href === currentPath || (href !== "/" && currentPath.startsWith(`${href}/`));
+  const expressionPage = (expressionId: string) => (expressionId === "herbal" ? "/herbal" : "/gin");
 
   /* ---------- Bloques compartidos ---------- */
 
@@ -328,47 +348,65 @@ function App({ page }: { page: Page }) {
     </motion.div>
   );
 
-  const cocktailsSection = (filter: (expressionId: string) => boolean, eyebrow: string, title: ReactNode, desc: ReactNode) => (
-    <motion.section id="cocteles" className="section" {...inView}>
-      <div className="container">
-        {sectionHeader(eyebrow, title, desc)}
-        <div className={`cocktail-grid ${page === "home" ? "" : "cocktail-grid--duo"}`}>
-          {cocktails
-            .filter((c) => filter(c.expressionId))
-            .map((c) => (
+  const cocktailsSection = (
+    filter: (c: (typeof cocktails)[number]) => boolean,
+    eyebrow: string,
+    title: ReactNode,
+    desc: ReactNode,
+    { compact = false, sectionId = "cocteles" }: { compact?: boolean; sectionId?: string } = {}
+  ) => {
+    const list = cocktails.filter(filter);
+    const gridClass = list.length === 2 ? "cocktail-grid--duo" : list.length === 3 ? "cocktail-grid--trio" : "";
+    return (
+      <motion.section id={sectionId} className="section" {...inView}>
+        <div className="container">
+          {sectionHeader(eyebrow, title, desc)}
+          <div className={`cocktail-grid ${gridClass}`}>
+            {list.map((c) => (
               <motion.article variants={fadeUp} key={c.id} className="cocktail-card" style={accentStyle(c.expressionId)}>
-                <div className="cocktail-media">
-                  <img
+                <a href={`/cocteles/${c.id}`} className="cocktail-media" tabIndex={-1} aria-hidden="true">
+                  <Picture
                     src={c.image}
-                    alt={c.imageAlt}
+                    alt=""
                     width={c.imageWidth}
                     height={c.imageHeight}
                     loading="lazy"
+                    sizes={SIZES.quarter}
                     style={c.imagePosition ? { objectPosition: c.imagePosition } : undefined}
                   />
                   <span className="cocktail-glass">{c.glass}</span>
-                </div>
+                </a>
                 <div className="cocktail-body">
                   <span className="cocktail-expression">{c.expression}</span>
-                  <h3 className="cocktail-name">{c.name}</h3>
+                  <h3 className="cocktail-name">
+                    <a href={`/cocteles/${c.id}`}>{c.name}</a>
+                  </h3>
                   <p className="cocktail-tagline">{c.tagline}</p>
-                  <ul className="cocktail-ingredients">
-                    {c.ingredients.map((ing) => (
-                      <li key={ing}>{ing}</li>
-                    ))}
-                  </ul>
-                  <ol className="cocktail-steps">
-                    {c.steps.map((step) => (
-                      <li key={step}>{step}</li>
-                    ))}
-                  </ol>
+                  {!compact && (
+                    <>
+                      <ul className="cocktail-ingredients">
+                        {c.ingredients.map((ing) => (
+                          <li key={ing}>{ing}</li>
+                        ))}
+                      </ul>
+                      <ol className="cocktail-steps">
+                        {c.steps.map((step) => (
+                          <li key={step}>{step}</li>
+                        ))}
+                      </ol>
+                    </>
+                  )}
+                  <a href={`/cocteles/${c.id}`} className="cocktail-more">
+                    Receta de {c.name}
+                  </a>
                 </div>
               </motion.article>
             ))}
+          </div>
         </div>
-      </div>
-    </motion.section>
-  );
+      </motion.section>
+    );
+  };
 
   const faqSection = (title: ReactNode, desc: ReactNode) => (
     <motion.section id="faq" className="section" {...inView}>
@@ -446,12 +484,49 @@ function App({ page }: { page: Page }) {
       </section>
     );
 
-  const breadcrumb = (label: string) => (
+  // Ruta visible; coincide con el BreadcrumbList del schema (src/seo.ts).
+  const breadcrumb = (...trail: { label: string; href?: string }[]) => (
     <nav className="breadcrumb hero-reveal" aria-label="Ruta de navegación">
       <a href="/">Inicio</a>
-      <span aria-hidden="true">/</span>
-      <span aria-current="page">{label}</span>
+      {trail.map((item) => (
+        <span key={item.label} className="breadcrumb-step">
+          <span aria-hidden="true">/</span>
+          {item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}
+        </span>
+      ))}
     </nav>
+  );
+
+  // Las dos expresiones lado a lado, enlazando a sus páginas (cierre de /cocteles y de cada receta).
+  const productDuo = (
+    <section className="split-band split-band--compact" aria-labelledby="duo-title">
+      <motion.div className="container split-band-head" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
+        <span className="section-eyebrow">Las botellas</span>
+        <h2 id="duo-title" className="section-title">
+          HERBAL BAGPIPER <span className="accent">&amp; GIN BAGPIPER</span>
+        </h2>
+      </motion.div>
+      <div className="split-band-panels">
+        <a href="/herbal" className="split-panel" style={accentStyle("herbal")}>
+          <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una discoteca" />
+          <span className="split-panel-shade" aria-hidden="true" />
+          <span className="split-panel-content">
+            <span className="split-panel-tag">Expresión Herbal · 35% Vol.</span>
+            <span className="split-panel-title">Herbal Liqueur</span>
+            <span className="split-panel-cta">Ver Bagpiper Herbal</span>
+          </span>
+        </a>
+        <a href="/gin" className="split-panel split-panel--gin" style={accentStyle("black-pink")}>
+          <ParallaxImg src={GIN.pinkGlass} alt="Bagpiper London Dry Gin Black Pink servido en copa balón" />
+          <span className="split-panel-shade" aria-hidden="true" />
+          <span className="split-panel-content">
+            <span className="split-panel-tag">Expresión Gin · 40% Vol.</span>
+            <span className="split-panel-title">London Dry Gin</span>
+            <span className="split-panel-cta">Ver Bagpiper Gin</span>
+          </span>
+        </a>
+      </div>
+    </section>
   );
 
   const specChips = (items: string[]) => (
@@ -528,7 +603,7 @@ function App({ page }: { page: Page }) {
             <div className="bento-card bento-card-stat bento-card-mini-video hero-reveal" style={revealDelay(1)}>
               <div className="mood-rotator" aria-hidden="true">
                 {moodSlides.map((slide, i) => (
-                  <img key={slide.src} src={slide.src} alt="" className={`mood-slide ${moodIndex === i ? "is-active" : ""}`} />
+                  <Picture key={slide.src} src={slide.src} alt="" className={`mood-slide ${moodIndex === i ? "is-active" : ""}`} />
                 ))}
               </div>
               <div className="side-video-overlay" />
@@ -632,9 +707,9 @@ function App({ page }: { page: Page }) {
         <div className="container">
           <div className="gin-layout feature-layout--reverse">
             <motion.div variants={fadeUp} className="gin-mosaic">
-              <img src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro de la nueva presentación, sobre barra nocturna" width={900} height={1200} loading="lazy" />
-              <img src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser en una discoteca" width={1280} height={720} loading="lazy" />
-              <img src={CLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una fiesta" width={1280} height={720} loading="lazy" />
+              <Picture src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro de la nueva presentación, sobre barra nocturna" width={900} height={1200} loading="lazy" />
+              <Picture src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser en una discoteca" width={1280} height={720} loading="lazy" />
+              <Picture src={CLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una fiesta" width={1280} height={720} loading="lazy" />
             </motion.div>
 
             <div className="gin-content">
@@ -684,9 +759,9 @@ function App({ page }: { page: Page }) {
         <div className="container">
           <div className="gin-layout">
             <motion.div variants={fadeUp} className="gin-mosaic">
-              <img src={GIN.classicBar} alt="Bagpiper London Dry Gin Classic con copa de gin tonic en un bar nocturno" width={718} height={1086} loading="lazy" />
-              <img src={GIN.classicTonic} alt="Bagpiper London Dry Gin Classic y copa balón con hielo" width={1023} height={701} loading="lazy" />
-              <img src={GIN.pinkGarden} alt="Bagpiper London Dry Gin Black Pink con frutos del bosque en un jardín" width={1023} height={729} loading="lazy" />
+              <Picture src={GIN.classicBar} alt="Bagpiper London Dry Gin Classic con copa de gin tonic en un bar nocturno" width={718} height={1086} loading="lazy" />
+              <Picture src={GIN.classicTonic} alt="Bagpiper London Dry Gin Classic y copa balón con hielo" width={1023} height={701} loading="lazy" />
+              <Picture src={GIN.pinkGarden} alt="Bagpiper London Dry Gin Black Pink con frutos del bosque en un jardín" width={1023} height={729} loading="lazy" />
             </motion.div>
 
             <div className="gin-content">
@@ -757,7 +832,7 @@ function App({ page }: { page: Page }) {
                 aria-label={`Ver ficha de Bagpiper ${expr.name} ${expr.short}`}
               >
                 <div className="expr-card-media">
-                  <img src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
+                  <Picture src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
                   <span className="expr-card-family">{expr.familyLabel}</span>
                 </div>
                 <div className="expr-card-body">
@@ -786,7 +861,8 @@ function App({ page }: { page: Page }) {
         <>
           CÓMO SE TOMA <span className="accent">BAGPIPER</span>
         </>,
-        "Frío y directo para el licor herbal; en copa balón con tónica para el gin. Cuatro recetas de la casa, dos por expresión."
+        "Frío y directo para el licor herbal; en copa balón con tónica para el gin. Cuatro recetas de la casa, dos por expresión.",
+        { compact: true }
       )}
 
       <motion.section id="historia" className="section" {...inView}>
@@ -814,7 +890,7 @@ function App({ page }: { page: Page }) {
             </motion.div>
 
             <motion.div variants={fadeUp} className="heritage-img-wrapper">
-              <img src={HERBAL_PARTY_IMG} alt="Nueva presentación de Bagpiper Herbal Liqueur junto a un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
+              <Picture src={HERBAL_PARTY_IMG} alt="Nueva presentación de Bagpiper Herbal Liqueur junto a un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
             </motion.div>
 
             <motion.div variants={fadeUp} className="timeline">
@@ -879,7 +955,7 @@ function App({ page }: { page: Page }) {
         <div className="container">
           <div className="botanicals-layout">
             <motion.div variants={fadeUp} className="botanicals-img-panel botanicals-img-panel--studio">
-              <img
+              <Picture
                 src={HERBAL_PACKSHOT_IMG}
                 alt="Nueva presentación de Bagpiper Herbal Liqueur: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
                 width={800}
@@ -941,17 +1017,17 @@ function App({ page }: { page: Page }) {
   const herbalContent = (
     <>
       <section className="container product-hero" id="top">
-        {breadcrumb("Bagpiper Herbal Liqueur")}
+        {breadcrumb({ label: "Bagpiper Herbal Liqueur" })}
         <div className="product-hero-grid">
           <div className="product-hero-copy">
             <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
-              Expresión Herbal · Lamoille, Nevada
+              Herbal Bagpiper · Lamoille, Nevada
             </span>
             <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
               BAGPIPER <span className="accent hero-title-sub">HERBAL LIQUEUR</span>
             </h1>
             <p className="section-desc hero-reveal" style={revealDelay(2)}>
-              {BRAND_STATEMENT} Bagpiper Herbal Liqueur es la receta original de la casa: un licor herbal oscuro y
+              {BRAND_STATEMENT} Bagpiper Herbal Liqueur —el herbal Bagpiper— es la receta original de la casa: un licor herbal oscuro y
               envolvente de hierbas, raíces, especias y botánicos, ahora en su nueva presentación de botella verde
               profundo. Se sirve muy frío, solo o en coctelería.
             </p>
@@ -966,11 +1042,12 @@ function App({ page }: { page: Page }) {
             </div>
           </div>
           <div className="product-hero-visual product-hero-visual--studio hero-reveal" style={revealDelay(2)}>
-            <img
+            <Picture
               src={HERBAL_PACKSHOT_IMG}
               alt="Botella de Bagpiper Herbal Liqueur, nueva presentación verde oscuro, 750 ml, 35% vol., etiqueta Smith & Johnson"
               width={800}
               height={1200}
+              sizes={HERO_IMAGE_SIZES.herbal}
               {...HIGH_PRIORITY}
             />
           </div>
@@ -995,9 +1072,9 @@ function App({ page }: { page: Page }) {
         <div className="container">
           <div className="gin-layout feature-layout--reverse">
             <motion.div variants={fadeUp} className="gin-mosaic">
-              <img src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro, sobre barra nocturna" width={900} height={1200} loading="lazy" />
-              <img src={HERBAL_PARTY_IMG} alt="Bagpiper Herbal Liqueur y un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
-              <img src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser" width={1280} height={720} loading="lazy" />
+              <Picture src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro, sobre barra nocturna" width={900} height={1200} loading="lazy" />
+              <Picture src={HERBAL_PARTY_IMG} alt="Bagpiper Herbal Liqueur y un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
+              <Picture src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser" width={1280} height={720} loading="lazy" />
             </motion.div>
             <div className="gin-content">
               <motion.div variants={fadeUp} className="section-header gin-header">
@@ -1025,12 +1102,13 @@ function App({ page }: { page: Page }) {
       </motion.section>
 
       {cocktailsSection(
-        (id) => id === "herbal",
+        (c) => c.expressionId === "herbal",
         "Cócteles con licor herbal",
         <>
           CÓCTELES CON <span className="accent">BAGPIPER HERBAL</span>
         </>,
-        "Dos recetas de la casa para Bagpiper Herbal Liqueur: el ritual frío con naranja y un tónico oscuro con romero."
+        "Dos recetas de la casa para el herbal Bagpiper: el ritual frío con naranja y un tónico oscuro con romero.",
+        { compact: true }
       )}
 
       {faqSection(
@@ -1049,17 +1127,17 @@ function App({ page }: { page: Page }) {
   const ginContent = (
     <>
       <section className="container product-hero" id="top">
-        {breadcrumb("Bagpiper London Dry Gin")}
+        {breadcrumb({ label: "Bagpiper London Dry Gin" })}
         <div className="product-hero-grid">
           <div className="product-hero-copy">
             <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
-              Expresión Gin · Lamoille, Nevada
+              Gin Bagpiper · Lamoille, Nevada
             </span>
             <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
               BAGPIPER <span className="accent hero-title-sub hero-title-sub--gin">LONDON DRY GIN</span>
             </h1>
             <p className="section-desc hero-reveal" style={revealDelay(2)}>
-              {BRAND_STATEMENT} Bagpiper London Dry Gin es su expresión gin: vapour infused y destilado a partir de 100%
+              {BRAND_STATEMENT} Bagpiper London Dry Gin —el gin Bagpiper— es su expresión gin: vapour infused y destilado a partir de 100%
               grano, en dos versiones con una misma firma. El Classic, seco y cítrico; el Black Pink, rosado y con frutos
               del bosque.
             </p>
@@ -1074,18 +1152,20 @@ function App({ page }: { page: Page }) {
             </div>
           </div>
           <div className="product-hero-visual product-hero-visual--duo hero-reveal" style={revealDelay(2)}>
-            <img
+            <Picture
               src={GIN.classicLondonDry}
               alt="Bagpiper London Dry Gin Classic, botella transparente con copa balón de gin tonic"
               width={654}
               height={1086}
+              sizes={HERO_IMAGE_SIZES.gin}
               {...HIGH_PRIORITY}
             />
-            <img
+            <Picture
               src={GIN.pinkBerries}
               alt="Bagpiper London Dry Gin Black Pink, botella rosada con copa de frutos del bosque"
               width={717}
               height={1086}
+              sizes={HERO_IMAGE_SIZES.gin}
             />
           </div>
         </div>
@@ -1113,7 +1193,7 @@ function App({ page }: { page: Page }) {
                 aria-label={`Ver ficha de Bagpiper ${expr.name} ${expr.short}`}
               >
                 <div className="expr-card-media">
-                  <img src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
+                  <Picture src={expr.image} alt={expr.imageAlt} width={expr.imageWidth} height={expr.imageHeight} loading="lazy" />
                   <span className="expr-card-family">{expr.familyLabel}</span>
                 </div>
                 <div className="expr-card-body">
@@ -1161,12 +1241,13 @@ function App({ page }: { page: Page }) {
       </section>
 
       {cocktailsSection(
-        (id) => id !== "herbal",
+        (c) => c.expressionId !== "herbal",
         "Gin tonic Bagpiper",
         <>
           CÓCTELES CON <span className="accent">BAGPIPER GIN</span>
         </>,
-        "Copa balón, hielo abundante y tónica fría: el gin tonic de cada versión."
+        "Copa balón, hielo abundante y tónica fría: el gin tonic del gin Bagpiper en cada versión.",
+        { compact: true }
       )}
 
       {faqSection(
@@ -1177,6 +1258,161 @@ function App({ page }: { page: Page }) {
       )}
 
       {crossLink("herbal")}
+    </>
+  );
+
+  /* ---------- /cocteles ---------- */
+
+  const coctelesContent = (
+    <>
+      <section className="container product-hero" id="top">
+        {breadcrumb({ label: "Cócteles" })}
+        <div className="product-hero-grid">
+          <div className="product-hero-copy">
+            <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
+              Recetas de la casa · Gin &amp; Herbal
+            </span>
+            <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
+              CÓCTELES <span className="accent hero-title-sub">CON BAGPIPER</span>
+            </h1>
+            <p className="section-desc hero-reveal" style={revealDelay(2)}>
+              Cuatro recetas oficiales, dos por expresión: el herbal Bagpiper bien frío o con tónica, y el gin Bagpiper en
+              gin tonic Classic o Black Pink. Ingredientes, medidas y pasos para prepararlos en casa o en la barra.
+            </p>
+            {specChips(["4 recetas", "Herbal Liqueur", "London Dry Gin", "2–3 min"])}
+            <div className="hero-actions hero-reveal" style={revealDelay(4)}>
+              <a href="#recetas" className="btn btn-primary">
+                Ver las recetas
+              </a>
+              <a href="/gin" className="btn btn-outline">
+                Bagpiper Gin
+              </a>
+            </div>
+          </div>
+          <div className="product-hero-visual product-hero-visual--quad hero-reveal" style={revealDelay(2)}>
+            {cocktails.map((c, i) => (
+              <Picture
+                key={c.id}
+                src={c.image}
+                alt={c.imageAlt}
+                sizes={HERO_IMAGE_SIZES.cocteles}
+                style={c.imagePosition ? { objectPosition: c.imagePosition } : undefined}
+                {...(i === 0 ? HIGH_PRIORITY : { loading: "lazy" })}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {cocktailsSection(
+        () => true,
+        "Las recetas",
+        <>
+          CUATRO RECETAS <span className="accent">DOS EXPRESIONES</span>
+        </>,
+        "Elige una receta para ver los ingredientes, las medidas y el consejo de la casa.",
+        { compact: true, sectionId: "recetas" }
+      )}
+
+      {faqSection(
+        <>
+          CÓCTELES <span className="text-outline">BAGPIPER</span>
+        </>,
+        "Lo que más nos preguntan sobre cómo tomar Bagpiper."
+      )}
+
+      {productDuo}
+    </>
+  );
+
+  /* ---------- /cocteles/<receta> ---------- */
+
+  const cocktailContent = cocktail && (
+    <>
+      <section className="container product-hero" id="top" style={accentStyle(cocktail.expressionId)}>
+        {breadcrumb({ label: "Cócteles", href: "/cocteles" }, { label: cocktail.name })}
+        <div className="product-hero-grid">
+          <div className="product-hero-copy">
+            <span className="section-eyebrow hero-reveal" style={revealDelay(1)}>
+              Receta con {cocktail.expression}
+            </span>
+            <h1 className="hero-title hero-reveal" style={revealDelay(1)}>
+              {cocktail.name.toUpperCase()}{" "}
+              <span className={`accent hero-title-sub ${cocktail.expressionId === "herbal" ? "" : "hero-title-sub--gin"}`}>
+                {cocktail.expressionId === "herbal" ? "CON HERBAL BAGPIPER" : "CON GIN BAGPIPER"}
+              </span>
+            </h1>
+            <p className="section-desc hero-reveal" style={revealDelay(2)}>
+              {cocktail.intro}
+            </p>
+            {specChips([cocktail.glass, `${cocktail.minutes} min`, "1 trago", cocktail.expressionId === "herbal" ? "Licor herbal" : "Gin"])}
+            <div className="hero-actions hero-reveal" style={revealDelay(4)}>
+              <a href="#receta" className="btn btn-primary">
+                Ver la receta
+              </a>
+              <a href={expressionPage(cocktail.expressionId)} className="btn btn-outline">
+                {cocktail.expression}
+              </a>
+            </div>
+          </div>
+          <div className="product-hero-visual hero-reveal" style={revealDelay(2)}>
+            <Picture
+              src={cocktail.image}
+              alt={cocktail.imageAlt}
+              width={cocktail.imageWidth}
+              height={cocktail.imageHeight}
+              sizes={HERO_IMAGE_SIZES.cocktail}
+              style={cocktail.imagePosition ? { objectPosition: cocktail.imagePosition } : undefined}
+              {...HIGH_PRIORITY}
+            />
+          </div>
+        </div>
+      </section>
+
+      <motion.section id="receta" className="section" style={accentStyle(cocktail.expressionId)} {...inView}>
+        <div className="container">
+          {sectionHeader(
+            `Receta · ${cocktail.glass} · ${cocktail.minutes} min`,
+            <>
+              CÓMO PREPARAR <span className="accent">{cocktail.name.toUpperCase()}</span>
+            </>,
+            cocktail.tagline
+          )}
+          <div className="recipe-layout">
+            <motion.div variants={fadeUp} className="recipe-block">
+              <h3 className="recipe-block-title">Ingredientes</h3>
+              <ul className="cocktail-ingredients">
+                {cocktail.ingredients.map((ing) => (
+                  <li key={ing}>{ing}</li>
+                ))}
+              </ul>
+            </motion.div>
+            <motion.div variants={fadeUp} className="recipe-block">
+              <h3 className="recipe-block-title">Preparación</h3>
+              <ol className="cocktail-steps recipe-steps">
+                {cocktail.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+              <p className="recipe-tip">
+                <strong>Consejo de la casa.</strong> {cocktail.tip}
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {cocktailsSection(
+        (c) => c.id !== cocktail.id,
+        "Más recetas",
+        <>
+          OTROS CÓCTELES <span className="accent">BAGPIPER</span>
+        </>,
+        "Las demás recetas de la casa con el herbal y el gin Bagpiper.",
+        { compact: true, sectionId: "mas-cocteles" }
+      )}
+
+      {productDuo}
     </>
   );
 
@@ -1238,7 +1474,7 @@ function App({ page }: { page: Page }) {
 
             <nav className="nav-links-desktop" aria-label="Principal">
               {navLinks.map((link) => (
-                <a key={link.label} href={link.href} className="nav-link" aria-current={link.href === currentPath ? "page" : undefined}>
+                <a key={link.label} href={link.href} className="nav-link" aria-current={isCurrent(link.href) ? "page" : undefined}>
                   {link.label}
                 </a>
               ))}
@@ -1279,7 +1515,7 @@ function App({ page }: { page: Page }) {
                     key={link.label}
                     href={link.href}
                     className="mobile-menu-link"
-                    aria-current={link.href === currentPath ? "page" : undefined}
+                    aria-current={isCurrent(link.href) ? "page" : undefined}
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}
@@ -1300,6 +1536,8 @@ function App({ page }: { page: Page }) {
           {page === "home" && homeContent}
           {page === "herbal" && herbalContent}
           {page === "gin" && ginContent}
+          {page === "cocteles" && coctelesContent}
+          {page === "cocktail" && cocktailContent}
 
           <motion.section id="contacto" className="section ig-section" {...inView}>
             <div className="container">
@@ -1315,7 +1553,7 @@ function App({ page }: { page: Page }) {
               )}
 
               <motion.div variants={fadeUp} className="contact-panel">
-                <img
+                <Picture
                   src={HERBAL_BAR_IMG}
                   alt="Bagpiper Herbal Liqueur sobre la barra de una fiesta con luces violetas"
                   className="contact-panel-bg"
@@ -1344,7 +1582,7 @@ function App({ page }: { page: Page }) {
             <a href="/">Inicio</a>
             <a href="/herbal">Bagpiper Herbal Liqueur</a>
             <a href="/gin">Bagpiper London Dry Gin</a>
-            <a href="/#cocteles">Cócteles</a>
+            <a href="/cocteles">Cócteles Bagpiper</a>
             <a href="/#historia">Historia</a>
             <a href="#contacto">Contacto</a>
           </nav>
@@ -1375,7 +1613,7 @@ function App({ page }: { page: Page }) {
                 Cerrar
               </button>
               <div className={`ficha-visual ${ficha.studio ? "" : "ficha-visual--photo"}`}>
-                <img src={ficha.image} alt={ficha.imageAlt} width={ficha.imageWidth} height={ficha.imageHeight} />
+                <Picture src={ficha.image} alt={ficha.imageAlt} width={ficha.imageWidth} height={ficha.imageHeight} />
               </div>
               <div className="ficha-body">
                 <p className="product-card-tag">

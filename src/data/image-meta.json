@@ -1,0 +1,288 @@
+{
+  "images": {
+    "/images/bagpiper-club.jpg": {
+      "w": 1280,
+      "h": 720,
+      "webp": [
+        {
+          "src": "/images/bagpiper-club-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-club.webp",
+          "w": 1280
+        }
+      ]
+    },
+    "/images/bagpiper-gin-black-pink-copa.jpg": {
+      "w": 713,
+      "h": 1086,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-black-pink-copa.webp",
+          "w": 713
+        }
+      ]
+    },
+    "/images/bagpiper-gin-black-pink-fruta-del-bosque.jpg": {
+      "w": 717,
+      "h": 1086,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-black-pink-fruta-del-bosque.webp",
+          "w": 717
+        }
+      ]
+    },
+    "/images/bagpiper-gin-black-pink-jardin.jpg": {
+      "w": 1023,
+      "h": 729,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-black-pink-jardin-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-gin-black-pink-jardin.webp",
+          "w": 1023
+        }
+      ]
+    },
+    "/images/bagpiper-gin-black-pink-verano.jpg": {
+      "w": 1023,
+      "h": 797,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-black-pink-verano-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-gin-black-pink-verano.webp",
+          "w": 1023
+        }
+      ]
+    },
+    "/images/bagpiper-gin-classic-bar.jpg": {
+      "w": 718,
+      "h": 1086,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-classic-bar.webp",
+          "w": 718
+        }
+      ]
+    },
+    "/images/bagpiper-gin-classic-gin-tonic.jpg": {
+      "w": 1023,
+      "h": 701,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-classic-gin-tonic-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-gin-classic-gin-tonic.webp",
+          "w": 1023
+        }
+      ]
+    },
+    "/images/bagpiper-gin-classic-limon.jpg": {
+      "w": 1023,
+      "h": 828,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-classic-limon-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-gin-classic-limon.webp",
+          "w": 1023
+        }
+      ]
+    },
+    "/images/bagpiper-gin-classic-london-dry.jpg": {
+      "w": 654,
+      "h": 1086,
+      "webp": [
+        {
+          "src": "/images/bagpiper-gin-classic-london-dry.webp",
+          "w": 654
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-bar.jpg": {
+      "w": 1280,
+      "h": 720,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-bar-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-bar.webp",
+          "w": 1280
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-lasers.jpg": {
+      "w": 1280,
+      "h": 720,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-lasers-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-lasers.webp",
+          "w": 1280
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-packshot.jpg": {
+      "w": 800,
+      "h": 1200,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-packshot-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-packshot.webp",
+          "w": 800
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-party.jpg": {
+      "w": 540,
+      "h": 720,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-party.webp",
+          "w": 540
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-ritual.jpg": {
+      "w": 1280,
+      "h": 720,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-ritual-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-ritual.webp",
+          "w": 1280
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-tonic.jpg": {
+      "w": 720,
+      "h": 880,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-tonic.webp",
+          "w": 720
+        }
+      ]
+    },
+    "/images/bagpiper-herbal-vertical.jpg": {
+      "w": 900,
+      "h": 1200,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-vertical-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-vertical.webp",
+          "w": 900
+        }
+      ]
+    },
+    "/images/bagpiper-nightclub.jpg": {
+      "w": 1600,
+      "h": 894,
+      "webp": [
+        {
+          "src": "/images/bagpiper-nightclub-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-nightclub.webp",
+          "w": 1600
+        }
+      ]
+    }
+  },
+  "recipes": {
+    "herbal-orange": [
+      {
+        "src": "/images/recetas/herbal-orange-16x9.jpg",
+        "w": 1280,
+        "h": 720
+      },
+      {
+        "src": "/images/recetas/herbal-orange-4x3.jpg",
+        "w": 960,
+        "h": 720
+      },
+      {
+        "src": "/images/recetas/herbal-orange-1x1.jpg",
+        "w": 720,
+        "h": 720
+      }
+    ],
+    "dark-piper-tonic": [
+      {
+        "src": "/images/recetas/dark-piper-tonic-16x9.jpg",
+        "w": 720,
+        "h": 405
+      },
+      {
+        "src": "/images/recetas/dark-piper-tonic-4x3.jpg",
+        "w": 720,
+        "h": 540
+      },
+      {
+        "src": "/images/recetas/dark-piper-tonic-1x1.jpg",
+        "w": 720,
+        "h": 720
+      }
+    ],
+    "piper-classic-tonic": [
+      {
+        "src": "/images/recetas/piper-classic-tonic-16x9.jpg",
+        "w": 1023,
+        "h": 575
+      },
+      {
+        "src": "/images/recetas/piper-classic-tonic-4x3.jpg",
+        "w": 1023,
+        "h": 767
+      },
+      {
+        "src": "/images/recetas/piper-classic-tonic-1x1.jpg",
+        "w": 828,
+        "h": 828
+      }
+    ],
+    "black-pink-berry-tonic": [
+      {
+        "src": "/images/recetas/black-pink-berry-tonic-16x9.jpg",
+        "w": 1023,
+        "h": 575
+      },
+      {
+        "src": "/images/recetas/black-pink-berry-tonic-4x3.jpg",
+        "w": 1023,
+        "h": 767
+      },
+      {
+        "src": "/images/recetas/black-pink-berry-tonic-1x1.jpg",
+        "w": 797,
+        "h": 797
+      }
+    ]
+  }
+}

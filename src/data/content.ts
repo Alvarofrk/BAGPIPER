@@ -7,7 +7,7 @@ export const navLinks = [
   { label: "Herbal", href: "/herbal" },
   { label: "Gin", href: "/gin" },
   { label: "Colección", href: "/#expresiones" },
-  { label: "Cócteles", href: "/#cocteles" },
+  { label: "Cócteles", href: "/cocteles" },
   { label: "Historia", href: "/#historia" },
   { label: "Galería", href: "/#mundo" },
   { label: "FAQ", href: "/#faq" },
@@ -206,11 +206,17 @@ export const herbalHighlights = [
 ];
 
 export type Cocktail = {
+  /** También es el slug de su página: /cocteles/<id> */
   id: string;
   expressionId: string;
   expression: string;
   name: string;
   tagline: string;
+  /** Párrafo de introducción de la página de la receta. */
+  intro: string;
+  /** Consejo de la casa que cierra la receta. */
+  tip: string;
+  minutes: number;
   glass: string;
   ingredients: string[];
   steps: string[];
@@ -228,6 +234,10 @@ export const cocktails: Cocktail[] = [
     expression: "Bagpiper Herbal Liqueur",
     name: "Herbal Orange",
     tagline: "El ritual de la casa: frío, herbal y cítrico.",
+    intro:
+      "Herbal Orange es la forma más directa de tomar el herbal Bagpiper: Bagpiper Herbal Liqueur muy frío, sobre hielo, con el aceite de la piel de naranja. Las hierbas y especias de la receta original se abren sin perder intensidad.",
+    tip: "Guarda la botella en el congelador o en la parte más fría de la nevera: el frío es parte de la receta.",
+    minutes: 2,
     glass: "Vaso corto",
     ingredients: ["50 ml de Bagpiper Herbal Liqueur bien frío", "Hielo en cubos", "Piel y rodaja de naranja"],
     steps: [
@@ -248,6 +258,10 @@ export const cocktails: Cocktail[] = [
     expression: "Bagpiper Herbal Liqueur",
     name: "Dark Piper Tonic",
     tagline: "Oscuro y burbujeante, con romero y limón.",
+    intro:
+      "Dark Piper Tonic alarga el licor herbal Bagpiper con tónica fría: un trago oscuro, burbujeante y fresco, con el perfume del romero y un toque de limón. Ideal para la noche larga.",
+    tip: "Pasa la ramita de romero por el borde del vaso antes de servir para que el aroma llegue con cada sorbo.",
+    minutes: 3,
     glass: "Vaso bajo",
     ingredients: [
       "45 ml de Bagpiper Herbal Liqueur",
@@ -271,6 +285,10 @@ export const cocktails: Cocktail[] = [
     expression: "Bagpiper London Dry Gin Classic",
     name: "Piper Classic Tonic",
     tagline: "El gin tonic de siempre, seco y limpio.",
+    intro:
+      "Piper Classic Tonic es el gin tonic del gin Bagpiper: Bagpiper London Dry Gin Classic, tónica premium y piel de limón en copa balón. Seco, cítrico y con el enebro al frente.",
+    tip: "Usa hielo grande y bien seco: se derrite más lento y mantiene la tónica con burbuja hasta el final.",
+    minutes: 3,
     glass: "Copa balón",
     ingredients: [
       "50 ml de Bagpiper London Dry Gin Classic",
@@ -294,6 +312,10 @@ export const cocktails: Cocktail[] = [
     expression: "Bagpiper London Dry Gin Black Pink",
     name: "Black Pink Berry Tonic",
     tagline: "Rosado, frutal y fresco, con frutos del bosque.",
+    intro:
+      "Black Pink Berry Tonic es el gin tonic rosado de Bagpiper: London Dry Gin Black Pink con tónica fría y frutos del bosque. Frambuesa, mora y arándano sobre la base de enebro.",
+    tip: "Congela algunas frambuesas y moras y úsalas como hielo: enfrían sin aguar y suman color.",
+    minutes: 3,
     glass: "Copa balón",
     ingredients: [
       "50 ml de Bagpiper London Dry Gin Black Pink",
@@ -313,7 +335,8 @@ export const cocktails: Cocktail[] = [
   },
 ];
 
-export type Page = "home" | "herbal" | "gin";
+/** Páginas del sitio. "cocktail" es la plantilla de /cocteles/<id>, que recibe además el id de la receta. */
+export type Page = "home" | "herbal" | "gin" | "cocteles" | "cocktail";
 
 // Atributos tomados de la etiqueta de la nueva presentación ("A secret blend of fine botanicals").
 export const herbalProfile = [
@@ -409,7 +432,7 @@ export const faqs: Faq[] = [
   {
     q: "¿Qué cócteles se preparan con Bagpiper?",
     a: "Con el licor herbal: Herbal Orange (frío, con hielo y naranja) y Dark Piper Tonic (con tónica, limón y romero). Con el gin: Piper Classic Tonic (London Dry Classic, tónica y piel de limón) y Black Pink Berry Tonic (Black Pink, tónica y frutos del bosque).",
-    pages: ["home"],
+    pages: ["home", "cocteles"],
   },
   {
     q: "¿De dónde es Bagpiper?",
@@ -419,6 +442,6 @@ export const faqs: Faq[] = [
   {
     q: "¿Dónde se consigue Bagpiper?",
     a: "Desde 2024 Bagpiper trabaja con importadores y distribuidores de bebidas espirituosas en Latinoamérica. La presencia comercial de sus gines y licores herbales se desarrolla de forma progresiva en la región.",
-    pages: ["home", "herbal", "gin"],
+    pages: ["home", "herbal", "gin", "cocteles"],
   },
 ];
