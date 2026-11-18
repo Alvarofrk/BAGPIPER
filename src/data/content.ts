@@ -110,6 +110,45 @@ export const regions = [
   { name: "Frutos del bosque", role: "Gin Black Pink · dulzor botánico" },
 ];
 
+export type HerbalPresentation = {
+  id: "dark-green" | "amber";
+  name: string;
+  /** Rasgo visual corto para chips y botones. */
+  look: string;
+  description: string;
+  image: string;
+  imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
+};
+
+// Las dos botellas de Bagpiper Herbal Liqueur: misma receta, 35% vol. y 750 ml.
+// La primera es la presentación por defecto (hero de /herbal, tarjeta de colección y ficha).
+export const herbalPresentations: HerbalPresentation[] = [
+  {
+    id: "dark-green",
+    name: "Dark Green",
+    look: "Botella verde profundo",
+    description:
+      "Botella verde profundo con tapa negra, la etiqueta vintage de Smith & Johnson y la contraetiqueta A Secret Blend of Fine Botanicals.",
+    image: "/images/bagpiper-herbal-packshot.jpg",
+    imageAlt: "Bagpiper Herbal Liqueur, presentación Dark Green: botella verde oscuro 750 ml, 35% vol., etiqueta Smith & Johnson",
+    imageWidth: 800,
+    imageHeight: 1200,
+  },
+  {
+    id: "amber",
+    name: "Amber",
+    look: "Vidrio transparente y corcho",
+    description:
+      "Vidrio transparente que deja ver el color oscuro del licor, tapón de corcho natural y la misma etiqueta vintage de Smith & Johnson Master Liquormakers.",
+    image: "/images/bagpiper-herbal-amber.jpg",
+    imageAlt: "Bagpiper Herbal Liqueur, presentación Amber: botella de vidrio transparente con tapón de corcho, 750 ml, 35% vol., etiqueta Smith & Johnson",
+    imageWidth: 1024,
+    imageHeight: 1536,
+  },
+];
+
 export type Expression = {
   id: string;
   family: "herbal" | "gin";
@@ -140,15 +179,16 @@ export const expressions: Expression[] = [
     short: "Original Recipe",
     line: "Crafted with selected herbs & botanicals",
     description:
-      "La receta original de la casa: un licor herbal de hierbas, raíces, especias y botánicos, oscuro y envolvente. Nueva presentación en botella verde profundo. Se sirve muy frío.",
+      "La receta original de la casa: un licor herbal de hierbas, raíces, especias y botánicos, oscuro y envolvente. Dos presentaciones: Dark Green, en botella verde profundo, y Amber, en vidrio transparente con tapón de corcho. Se sirve muy frío.",
     notes: ["Hierbas", "Raíces", "Especias", "Botánicos"],
     abv: "35% VOL.",
     volume: "750 ML",
     serve: "Serve Cold",
-    image: "/images/bagpiper-herbal-packshot.jpg",
-    imageAlt: "Bagpiper Herbal Liqueur, nueva presentación: botella verde oscuro 750 ml, 35% vol., etiqueta Smith & Johnson",
-    imageWidth: 800,
-    imageHeight: 1200,
+    // La ficha y la tarjeta de colección muestran la presentación por defecto (Dark Green).
+    image: herbalPresentations[0].image,
+    imageAlt: herbalPresentations[0].imageAlt,
+    imageWidth: herbalPresentations[0].imageWidth,
+    imageHeight: herbalPresentations[0].imageHeight,
     studio: true,
   },
   {
@@ -338,7 +378,7 @@ export const cocktails: Cocktail[] = [
 /** Páginas del sitio. "cocktail" es la plantilla de /cocteles/<id>, que recibe además el id de la receta. */
 export type Page = "home" | "herbal" | "gin" | "cocteles" | "cocktail";
 
-// Atributos tomados de la etiqueta de la nueva presentación ("A secret blend of fine botanicals").
+// Atributos tomados de la contraetiqueta de la presentación Dark Green ("A secret blend of fine botanicals").
 export const herbalProfile = [
   {
     title: "Hierbas naturales",
@@ -401,7 +441,12 @@ export const faqs: Faq[] = [
   },
   {
     q: "¿Qué es Bagpiper Herbal Liqueur?",
-    a: "Es el licor herbal de Bagpiper: una receta original de hierbas, raíces, especias y botánicos, desarrollada en Lamoille, Nevada. 35% vol., botella de 750 ml en su nueva presentación verde oscuro. Se sirve muy frío.",
+    a: "Es el licor herbal de Bagpiper: una receta original de hierbas, raíces, especias y botánicos, desarrollada en Lamoille, Nevada. 35% vol., botella de 750 ml. Se sirve muy frío.",
+    pages: ["herbal"],
+  },
+  {
+    q: "¿Qué presentaciones tiene Bagpiper Herbal Liqueur?",
+    a: "Dos presentaciones con la misma receta, 35% vol. y 750 ml: Dark Green, en botella verde profundo con tapa negra, y Amber, en vidrio transparente con tapón de corcho.",
     pages: ["herbal"],
   },
   {

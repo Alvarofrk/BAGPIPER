@@ -138,6 +138,20 @@
         }
       ]
     },
+    "/images/bagpiper-herbal-amber.jpg": {
+      "w": 1024,
+      "h": 1536,
+      "webp": [
+        {
+          "src": "/images/bagpiper-herbal-amber-640.webp",
+          "w": 640
+        },
+        {
+          "src": "/images/bagpiper-herbal-amber.webp",
+          "w": 1024
+        }
+      ]
+    },
     "/images/bagpiper-herbal-packshot.jpg": {
       "w": 800,
       "h": 1200,

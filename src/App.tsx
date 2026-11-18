@@ -8,6 +8,7 @@ import {
   ginHighlights,
   ginProfile,
   herbalHighlights,
+  herbalPresentations,
   herbalProfile,
   cocktails,
   marqueeItems,
@@ -73,7 +74,7 @@ type FilmItem = { src: string; label: string; alt: string };
 // Cinta de galería: dos filas que corren en sentido contrario, alternando herbal y gin.
 const filmRows: FilmItem[][] = [
   [
-    { src: NIGHTCLUB_IMG, label: "Herbal · Night Sessions", alt: "Bagpiper Herbal Liqueur nueva presentación sobre barra de discoteca con luces violetas" },
+    { src: NIGHTCLUB_IMG, label: "Herbal · Night Sessions", alt: "Bagpiper Herbal Liqueur presentación Dark Green sobre barra de discoteca con luces violetas" },
     { src: GIN.classicBar, label: "Classic Gin · Bar", alt: "Bagpiper London Dry Gin Classic con copa de gin tonic en un bar" },
     { src: HERBAL_PARTY_IMG, label: "Herbal · Dance Floor", alt: "Bagpiper Herbal Liqueur y trago con naranja en una fiesta" },
     { src: GIN.pinkGarden, label: "Black Pink · Garden", alt: "Bagpiper London Dry Gin Black Pink con frutos del bosque en jardín" },
@@ -114,7 +115,10 @@ const SIZES = {
   quarter: "(min-width: 1200px) 25vw, (min-width: 640px) 50vw, 100vw",
   mosaic: "(min-width: 900px) 30vw, 50vw",
   film: "(min-width: 900px) 28vw, 70vw",
+  presentation: "(min-width: 720px) 40vw, 100vw",
 };
+
+const herbalExpression = expressions.find((e) => e.id === "herbal")!;
 
 function ParallaxImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -184,8 +188,14 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [moodIndex, setMoodIndex] = useState(0);
   const [fichaId, setFichaId] = useState<string | null>(null);
+  // Presentación mostrada en la ficha del Herbal (índice de herbalPresentations); vuelve a Dark Green al cambiar de ficha.
+  const [fichaPresentation, setFichaPresentation] = useState(0);
 
   const ficha = expressions.find((e) => e.id === fichaId) ?? null;
+  const fichaImage =
+    ficha?.id === "herbal"
+      ? herbalPresentations[fichaPresentation]
+      : ficha && { image: ficha.image, imageAlt: ficha.imageAlt, imageWidth: ficha.imageWidth, imageHeight: ficha.imageHeight };
   const ginExpressions = expressions.filter((e) => e.family === "gin");
   const pageFaqs = faqs.filter((f) => f.pages.includes(page));
 
@@ -322,6 +332,10 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    setFichaPresentation(0);
+  }, [fichaId]);
 
   useEffect(() => {
     if (!ficha) return;
@@ -676,7 +690,7 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
 
         <div className="split-band-panels">
           <a href="/herbal" className="split-panel" style={accentStyle("herbal")}>
-            <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur, nueva presentación, en la barra de una discoteca" />
+            <ParallaxImg src={NIGHTCLUB_IMG} alt="Bagpiper Herbal Liqueur, presentación Dark Green, en la barra de una discoteca" />
             <span className="split-panel-shade" aria-hidden="true" />
             <span className="split-panel-content">
               <span className="split-panel-tag">01 · Expresión Herbal</span>
@@ -707,7 +721,7 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
         <div className="container">
           <div className="gin-layout feature-layout--reverse">
             <motion.div variants={fadeUp} className="gin-mosaic">
-              <Picture src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, botella verde oscuro de la nueva presentación, sobre barra nocturna" width={900} height={1200} loading="lazy" />
+              <Picture src={HERBAL_VERTICAL_IMG} alt="Bagpiper Herbal Liqueur, presentación Dark Green en botella verde oscuro, sobre barra nocturna" width={900} height={1200} loading="lazy" />
               <Picture src={HERBAL_LASERS_IMG} alt="Botella de Bagpiper Herbal Liqueur bajo luces láser en una discoteca" width={1280} height={720} loading="lazy" />
               <Picture src={CLUB_IMG} alt="Bagpiper Herbal Liqueur en la barra de una fiesta" width={1280} height={720} loading="lazy" />
             </motion.div>
@@ -720,8 +734,8 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
                 </h2>
                 <p className="section-desc">
                   La receta original de la casa, desarrollada en Lamoille, Nevada: un licor herbal oscuro y envolvente de
-                  hierbas, raíces, especias y botánicos. Nueva presentación en botella verde profundo. Se sirve muy frío,
-                  solo o en coctelería.
+                  hierbas, raíces, especias y botánicos. Dos presentaciones: Dark Green, en botella verde profundo, y Amber,
+                  en vidrio transparente con tapón de corcho. Se sirve muy frío, solo o en coctelería.
                 </p>
               </motion.div>
 
@@ -890,7 +904,7 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
             </motion.div>
 
             <motion.div variants={fadeUp} className="heritage-img-wrapper">
-              <Picture src={HERBAL_PARTY_IMG} alt="Nueva presentación de Bagpiper Herbal Liqueur junto a un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
+              <Picture src={HERBAL_PARTY_IMG} alt="Bagpiper Herbal Liqueur presentación Dark Green junto a un trago con naranja en una fiesta" width={540} height={720} loading="lazy" />
             </motion.div>
 
             <motion.div variants={fadeUp} className="timeline">
@@ -957,7 +971,7 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
             <motion.div variants={fadeUp} className="botanicals-img-panel botanicals-img-panel--studio">
               <Picture
                 src={HERBAL_PACKSHOT_IMG}
-                alt="Nueva presentación de Bagpiper Herbal Liqueur: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
+                alt="Bagpiper Herbal Liqueur, presentación Dark Green: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
                 width={800}
                 height={1200}
                 loading="lazy"
@@ -1028,8 +1042,8 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
             </h1>
             <p className="section-desc hero-reveal" style={revealDelay(2)}>
               {BRAND_STATEMENT} Bagpiper Herbal Liqueur —el herbal Bagpiper— es la receta original de la casa: un licor herbal oscuro y
-              envolvente de hierbas, raíces, especias y botánicos, ahora en su nueva presentación de botella verde
-              profundo. Se sirve muy frío, solo o en coctelería.
+              envolvente de hierbas, raíces, especias y botánicos, en dos presentaciones: Dark Green, en botella verde
+              profundo, y Amber, en vidrio transparente con tapón de corcho. Se sirve muy frío, solo o en coctelería.
             </p>
             {specChips(["35% Vol.", "750 ml", "Serve Cold", "Original Recipe"])}
             <div className="hero-actions hero-reveal" style={revealDelay(4)}>
@@ -1043,10 +1057,10 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
           </div>
           <div className="product-hero-visual product-hero-visual--studio hero-reveal" style={revealDelay(2)}>
             <Picture
-              src={HERBAL_PACKSHOT_IMG}
-              alt="Botella de Bagpiper Herbal Liqueur, nueva presentación verde oscuro, 750 ml, 35% vol., etiqueta Smith & Johnson"
-              width={800}
-              height={1200}
+              src={herbalPresentations[0].image}
+              alt={herbalPresentations[0].imageAlt}
+              width={herbalPresentations[0].imageWidth}
+              height={herbalPresentations[0].imageHeight}
               sizes={HERO_IMAGE_SIZES.herbal}
               {...HIGH_PRIORITY}
             />
@@ -1054,13 +1068,53 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
         </div>
       </section>
 
+      <motion.section id="presentaciones" className="section" {...inView}>
+        <div className="container">
+          {sectionHeader(
+            "Dos presentaciones",
+            <>
+              DARK GREEN <span className="accent">&amp; AMBER</span>
+            </>,
+            `La misma receta original, ${herbalExpression.abv.toLowerCase()} y ${herbalExpression.volume.toLowerCase()}, en dos botellas.`
+          )}
+          <div className="presentation-grid" style={accentStyle("herbal")}>
+            {herbalPresentations.map((p) => (
+              <motion.article variants={fadeUp} key={p.id} className="presentation-card">
+                <div className="presentation-media">
+                  <Picture
+                    src={p.image}
+                    alt={p.imageAlt}
+                    width={p.imageWidth}
+                    height={p.imageHeight}
+                    loading="lazy"
+                    sizes={SIZES.presentation}
+                  />
+                </div>
+                <div className="presentation-body">
+                  <span className="presentation-look">{p.look}</span>
+                  <h3 className="presentation-name">
+                    Bagpiper Herbal <span>{p.name}</span>
+                  </h3>
+                  <p className="presentation-text">{p.description}</p>
+                  <div className="expr-card-specs">
+                    <span>{herbalExpression.abv}</span>
+                    <span>{herbalExpression.volume}</span>
+                    <span>{herbalExpression.serve}</span>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
       {profileSection(
         "perfil",
         "A secret blend of fine botanicals",
         <>
           EL PERFIL <span className="accent">HERBAL</span>
         </>,
-        "Cuatro rasgos que la casa imprimió en la etiqueta de la nueva presentación y que definen a Bagpiper Herbal Liqueur.",
+        "Cuatro rasgos que la casa imprimió en la contraetiqueta de la presentación Dark Green y que definen a Bagpiper Herbal Liqueur.",
         herbalProfile,
         "herbal"
       )}
@@ -1078,12 +1132,12 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
             </motion.div>
             <div className="gin-content">
               <motion.div variants={fadeUp} className="section-header gin-header">
-                <span className="section-eyebrow">Nueva presentación</span>
+                <span className="section-eyebrow">Presentación Dark Green</span>
                 <h2 className="section-title">
                   LA NOCHE <span className="text-outline">ES VERDE</span>
                 </h2>
                 <p className="section-desc">
-                  La nueva botella de Bagpiper Herbal Liqueur es verde profundo, con la etiqueta vintage de Smith &amp;
+                  La botella Dark Green de Bagpiper Herbal Liqueur es verde profundo, con la etiqueta vintage de Smith &amp;
                   Johnson Master Liquormakers y la figura del Dark Piper al centro. Hecha para la barra, la pista y el
                   ritual del trago bien frío.
                 </p>
@@ -1613,7 +1667,15 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
                 Cerrar
               </button>
               <div className={`ficha-visual ${ficha.studio ? "" : "ficha-visual--photo"}`}>
-                <Picture src={ficha.image} alt={ficha.imageAlt} width={ficha.imageWidth} height={ficha.imageHeight} />
+                {fichaImage && (
+                  <Picture
+                    key={fichaImage.image}
+                    src={fichaImage.image}
+                    alt={fichaImage.imageAlt}
+                    width={fichaImage.imageWidth}
+                    height={fichaImage.imageHeight}
+                  />
+                )}
               </div>
               <div className="ficha-body">
                 <p className="product-card-tag">
@@ -1624,6 +1686,22 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
                 </h2>
                 <p className="ficha-line">{ficha.line}</p>
                 <p className="product-card-desc">{ficha.description}</p>
+                {ficha.id === "herbal" && (
+                  <div className="ficha-presentations" role="group" aria-label="Presentación del Herbal">
+                    {herbalPresentations.map((p, i) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className="ficha-presentation-btn"
+                        aria-pressed={fichaPresentation === i}
+                        onClick={() => setFichaPresentation(i)}
+                      >
+                        <strong>{p.name}</strong>
+                        <span>{p.look}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="product-specs">
                   <div>
                     <span>Alcohol</span>

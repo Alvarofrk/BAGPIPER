@@ -2098,6 +2098,12 @@ a.cocktail-media {
   object-fit: contain;
 }
 
+/* Botellas de estudio (Herbal): igual que en las tarjetas, el multiply funde el fondo blanco de la foto con el degradado. */
+.ficha-visual:not(.ficha-visual--photo) img {
+  filter: brightness(1.05);
+  mix-blend-mode: multiply;
+}
+
 .ficha-body {
   padding: 2rem 1.5rem 2.25rem;
   display: flex;
@@ -2165,6 +2171,137 @@ a.cocktail-media {
   background: var(--expr);
   color: #0d0c0b;
   outline: none;
+}
+
+/* Selector de presentación en la ficha del Herbal (Dark Green · Amber) */
+.ficha-presentations {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.ficha-presentation-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.ficha-presentation-btn strong {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.ficha-presentation-btn span {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.ficha-presentation-btn:hover,
+.ficha-presentation-btn:focus-visible {
+  border-color: var(--expr);
+  outline: none;
+}
+
+.ficha-presentation-btn[aria-pressed="true"] {
+  border-color: var(--expr);
+  background: color-mix(in srgb, var(--expr) 14%, transparent);
+}
+
+.ficha-presentation-btn[aria-pressed="true"] strong {
+  color: var(--expr);
+}
+
+/* PRESENTACIONES DEL HERBAL (/herbal#presentaciones) */
+.presentation-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 720px) {
+  .presentation-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.presentation-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: border-color 0.4s ease;
+}
+
+.presentation-card:hover {
+  border-color: color-mix(in srgb, var(--expr) 55%, transparent);
+}
+
+/* Mismo estudio que las tarjetas de botella: el multiply funde el fondo blanco de la foto con el degradado. */
+.presentation-media {
+  aspect-ratio: 4 / 5;
+  background: radial-gradient(ellipse at 50% 45%, #ffffff 0%, #f3ead8 68%, #dccaa8 100%);
+}
+
+.presentation-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 2.5rem 1rem 1rem;
+  filter: brightness(1.05);
+  mix-blend-mode: multiply;
+}
+
+.presentation-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.5rem 1.5rem 1.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.presentation-look {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--expr);
+}
+
+.presentation-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: var(--color-text-primary);
+}
+
+.presentation-name span {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.45rem;
+  letter-spacing: 0;
+  color: var(--expr);
+}
+
+.presentation-text {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
 }
 
 /* EXPRESSIONS */

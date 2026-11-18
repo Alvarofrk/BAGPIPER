@@ -1,6 +1,6 @@
 // Metadatos y datos estructurados por página. Se generan en el prerender a partir de content.ts,
 // así el JSON-LD siempre describe exactamente lo que la página muestra.
-import { BRAND_STATEMENT, cocktails, expressions, faqs, type Cocktail, type Page } from "./data/content";
+import { BRAND_STATEMENT, cocktails, expressions, faqs, herbalPresentations, type Cocktail, type Page } from "./data/content";
 import { HERO_IMAGE_SIZES } from "./data/lcp";
 import imageMeta from "./data/image-meta.json";
 
@@ -8,7 +8,7 @@ import imageMeta from "./data/image-meta.json";
 export const SITE = "https://www.bagpiper.site";
 
 /** Fecha de la última actualización real del contenido (lastmod del sitemap). Actualizar al cambiar textos o fotos. */
-export const CONTENT_UPDATED = "2026-11-02";
+export const CONTENT_UPDATED = "2026-11-18";
 
 type ImageVariants = { w: number; h: number; webp: { src: string; w: number }[] };
 const IMAGES = imageMeta.images as Record<string, ImageVariants>;
@@ -45,12 +45,13 @@ const STATIC_PAGES: Record<Exclude<Page, "cocktail">, PageMeta> = {
     path: "/herbal",
     title: "Bagpiper Herbal Liqueur | Licor Herbal · Sitio Oficial",
     description:
-      "Bagpiper Herbal Liqueur: licor herbal de hierbas, raíces y especias de Lamoille, Nevada. 35% vol., 750 ml, nueva presentación. Serve cold y cócteles.",
+      "Bagpiper Herbal Liqueur: licor herbal de hierbas, raíces y especias de Lamoille, Nevada. 35% vol., 750 ml, presentaciones Dark Green y Amber. Serve cold.",
     ogTitle: "Bagpiper Herbal Liqueur — Licor herbal de Lamoille, Nevada",
     ogImage: OG("/images/bagpiper-herbal-og.jpg"),
-    ogImageAlt: "Botella de Bagpiper Herbal Liqueur, nueva presentación",
+    ogImageAlt: "Botella de Bagpiper Herbal Liqueur, presentación Dark Green",
     trail: [{ name: "Bagpiper Herbal Liqueur", path: "/herbal" }],
-    preload: { src: "/images/bagpiper-herbal-packshot.jpg", sizes: HERO_IMAGE_SIZES.herbal },
+    // Misma imagen que el hero de /herbal (presentación por defecto).
+    preload: { src: herbalPresentations[0].image, sizes: HERO_IMAGE_SIZES.herbal },
   },
   gin: {
     path: "/gin",
@@ -192,7 +193,11 @@ const expressionThing = (id: string) => {
     "@id": `${url}#${e.id}`,
     name: EXPRESSION_NAMES[e.id],
     description: e.description,
-    image: imageObject(e.image, e.imageAlt),
+    // El Herbal se publica con sus dos presentaciones (Dark Green · Amber).
+    image:
+      e.id === "herbal"
+        ? herbalPresentations.map((p) => imageObject(p.image, p.imageAlt))
+        : imageObject(e.image, e.imageAlt),
     url,
     brand: { "@id": BRAND_ID },
     additionalProperty: [
@@ -290,7 +295,7 @@ export function buildJsonLd(page: Page, cocktailId?: string) {
         "@id": `${SITE}/#reel`,
         name: "Bagpiper — Herbal Liqueur & London Dry Gin",
         description:
-          "Reel oficial de Bagpiper: Herbal Liqueur en su nueva presentación y London Dry Gin en versiones Classic y Black Pink. Desarrollado en Lamoille, Nevada.",
+          "Reel oficial de Bagpiper: Herbal Liqueur y London Dry Gin en versiones Classic y Black Pink. Desarrollado en Lamoille, Nevada.",
         thumbnailUrl: abs("/images/bagpiper-hero-poster.jpg"),
         contentUrl: abs("/images/bagpiper-reel.mp4"),
         uploadDate: "2026-10-31",
@@ -335,7 +340,7 @@ export function renderSitemap(entries: { page: Page; cocktailId?: string; html: 
     <video:video>
       <video:thumbnail_loc>${abs("/images/bagpiper-hero-poster.jpg")}</video:thumbnail_loc>
       <video:title>Bagpiper — Herbal Liqueur &amp; London Dry Gin</video:title>
-      <video:description>Reel oficial de Bagpiper: Herbal Liqueur en su nueva presentación y London Dry Gin Classic y Black Pink.</video:description>
+      <video:description>Reel oficial de Bagpiper: Herbal Liqueur y London Dry Gin Classic y Black Pink.</video:description>
       <video:content_loc>${abs("/images/bagpiper-reel.mp4")}</video:content_loc>
       <video:duration>20</video:duration>
       <video:family_friendly>no</video:family_friendly>
