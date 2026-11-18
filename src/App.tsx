@@ -16,6 +16,7 @@ import {
   regions,
   stats,
   timeline,
+  type HerbalPresentation,
   type Page,
 } from "./data/content";
 import {
@@ -29,7 +30,6 @@ import {
 import Picture, { imageSize, webpSrcSet } from "./components/Picture";
 import { HERO_IMAGE_SIZES } from "./data/lcp";
 
-const HERBAL_PACKSHOT_IMG = "/images/bagpiper-herbal-packshot.jpg";
 const HERBAL_VERTICAL_IMG = "/images/bagpiper-herbal-vertical.jpg";
 const HERBAL_RITUAL_IMG = "/images/bagpiper-herbal-ritual.jpg";
 const HERBAL_PARTY_IMG = "/images/bagpiper-herbal-party.jpg";
@@ -61,6 +61,12 @@ const EXPRESSION_ACCENTS: Record<string, string> = {
   herbal: "#c4a36a",
   classic: "#8fb3e0",
   "black-pink": "#e0789a",
+};
+
+// Color de cada presentación del Herbal en los botones de la portada (claros para contrastar con el fondo oscuro).
+const PRESENTATION_ACCENTS: Record<HerbalPresentation["id"], string> = {
+  "dark-green": "#8fbf86",
+  amber: "#e0a050",
 };
 
 const moodSlides = [
@@ -119,6 +125,7 @@ const SIZES = {
 };
 
 const herbalExpression = expressions.find((e) => e.id === "herbal")!;
+const herbalAmber = herbalPresentations.find((p) => p.id === "amber")!;
 
 function ParallaxImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -188,7 +195,8 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [moodIndex, setMoodIndex] = useState(0);
   const [fichaId, setFichaId] = useState<string | null>(null);
-  // Presentación mostrada en la ficha del Herbal (índice de herbalPresentations); vuelve a Dark Green al cambiar de ficha.
+  // Presentación mostrada en la ficha del Herbal (índice de herbalPresentations). openFicha la fija y la navegación
+  // por hash la devuelve a Dark Green.
   const [fichaPresentation, setFichaPresentation] = useState(0);
 
   const ficha = expressions.find((e) => e.id === fichaId) ?? null;
@@ -306,7 +314,8 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
     setAgeVerified(false);
   };
 
-  const openFicha = (id: string) => {
+  const openFicha = (id: string, presentation = 0) => {
+    setFichaPresentation(presentation);
     setFichaId(id);
     if (window.location.hash !== `#ficha-${id}`) {
       window.history.pushState(null, "", `#ficha-${id}`);
@@ -328,14 +337,13 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
       return id && expressions.some((e) => e.id === id) ? id : null;
     };
     setFichaId(fromHash());
-    const onHash = () => setFichaId(fromHash());
+    const onHash = () => {
+      setFichaPresentation(0);
+      setFichaId(fromHash());
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-
-  useEffect(() => {
-    setFichaPresentation(0);
-  }, [fichaId]);
 
   useEffect(() => {
     if (!ficha) return;
@@ -749,14 +757,23 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
               </motion.div>
 
               <motion.div variants={fadeUp} className="gin-variants">
-                <button type="button" className="gin-variant" style={accentStyle("herbal")} onClick={() => openFicha("herbal")} aria-haspopup="dialog">
-                  <span className="gin-variant-dot" aria-hidden="true" />
-                  <span className="gin-variant-text">
-                    <strong>Original Recipe</strong>
-                    <span>Hierbas · Raíces · Especias · Serve Cold</span>
-                  </span>
-                  <span className="gin-variant-cta">Ficha</span>
-                </button>
+                {herbalPresentations.map((p, i) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className="gin-variant"
+                    style={{ "--expr": PRESENTATION_ACCENTS[p.id] } as CSSProperties}
+                    onClick={() => openFicha("herbal", i)}
+                    aria-haspopup="dialog"
+                  >
+                    <span className="gin-variant-dot" aria-hidden="true" />
+                    <span className="gin-variant-text">
+                      <strong>{p.name}</strong>
+                      <span>{p.look} · Original Recipe</span>
+                    </span>
+                    <span className="gin-variant-cta">Ficha</span>
+                  </button>
+                ))}
                 <a href="/herbal" className="feature-more">
                   Todo sobre Bagpiper Herbal Liqueur
                 </a>
@@ -969,11 +986,12 @@ function App({ page, cocktailId }: { page: Page; cocktailId?: string }) {
         <div className="container">
           <div className="botanicals-layout">
             <motion.div variants={fadeUp} className="botanicals-img-panel botanicals-img-panel--studio">
+              {/* La Amber deja ver el color del licor; la Dark Green ya aparece en la tarjeta de la colección. */}
               <Picture
-                src={HERBAL_PACKSHOT_IMG}
-                alt="Bagpiper Herbal Liqueur, presentación Dark Green: botella verde oscuro con etiqueta Crafted with selected herbs & botanicals"
-                width={800}
-                height={1200}
+                src={herbalAmber.image}
+                alt={herbalAmber.imageAlt}
+                width={herbalAmber.imageWidth}
+                height={herbalAmber.imageHeight}
                 loading="lazy"
               />
               <div className="botanicals-img-label">
